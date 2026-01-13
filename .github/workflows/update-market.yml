@@ -1,0 +1,37 @@
+name: Update Market Data
+
+on:
+  schedule:
+    - cron: "0 10 * * 1"   # Mondays 10am UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install requests
+
+      - name: Fetch data
+        run: python scripts/fetch_redfin.py
+
+      - name: Calculate metrics
+        run: python scripts/calculate_metrics.py
+
+      - name: Generate insights
+        run: python scripts/generate_insights.py
+
+      - name: Commit updates
+        run: |
+          git config user.name "market-bot"
+          git config user.email "bot@github.com"
+          git add data/
+          git commit -m "Weekly market update" || echo "No changes"
+          git push
