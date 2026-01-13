@@ -43,3 +43,12 @@ jobs:
           git add data/houston-county-ga/*/processed/market.json
           git commit -m "Weekly market update" || echo "No changes"
           git push
+
+    - name: Generate zips.json
+  run: |
+    echo "[" > data/houston-county-ga/zips.json
+    find data/houston-county-ga -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | awk '{print "\"" $0 "\","}' >> data/houston-county-ga/zips.json
+    # Remove trailing comma
+    sed -i '$ s/,$//' data/houston-county-ga/zips.json
+    echo "]" >> data/houston-county-ga/zips.json
+
