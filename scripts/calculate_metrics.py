@@ -24,7 +24,7 @@ if not rows:
 
 row = rows[0]
 
-# --- Extract last 4 months dynamically ---
+# --- Extract date columns dynamically ---
 date_columns = [c for c in row.keys() if c[:4].isdigit()]
 date_columns.sort()
 
@@ -41,7 +41,7 @@ previous = values[-2]
 price_change_pct = round((latest - previous) / previous * 100, 2)
 trend = "heating" if price_change_pct > 0 else "cooling"
 
-# Inventory proxy (price momentum based)
+# Inventory proxy (safe, deterministic)
 inventory_proxy = max(1, int(100 / max(abs(price_change_pct), 0.1)))
 
 market = {
@@ -81,4 +81,9 @@ market = {
     }
 }
 
-with open(OUT_DI_
+# --- Write output ---
+output_file = OUT_DIR / "market.json"
+with open(output_file, "w", encoding="utf-8") as f:
+    json.dump(market, f, indent=2)
+
+print(f"Market metrics generated successfully for ZIP {ZIP}")
