@@ -1,160 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Houston County Market Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Optional simple styles for cards and arrows */
-    .metric-container { display: flex; gap: 20px; flex-wrap: wrap; }
-    .metric { background: #f5f5f5; padding: 10px 15px; border-radius: 6px; flex: 1 1 150px; }
-    .arrow.up { color: green; } 
-    .arrow.down { color: red; } 
-    .arrow.flat { color: gray; }
-    .insight-cards { display: flex; gap: 10px; flex-wrap: wrap; }
-    .insight-card { padding: 10px 15px; border-radius: 6px; background: #eee; flex: 1 1 200px; }
-    .positive { border-left: 5px solid green; }
-    .negative { border-left: 5px solid red; }
-    .neutral { border-left: 5px solid gray; }
-    header h1 { display: flex; justify-content: space-between; align-items: center; }
-    #version { font-size: 0.9em; color: #555; margin-left: 15px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Houston County Real Estate Dashboard | RHMR</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/000000/home--v1.png">
 </head>
 <body>
-  <header>
-    <h1>
-      Houston County Real Estate Dashboard
-      <span id="version">v1.0</span>
-    </h1>
-    <div>
-      <label for="zipSelect">Select ZIP:</label>
-      <select id="zipSelect"></select>
-    </div>
-  </header>
-
-  <main>
-    <section id="metrics">
-      <h2>Market Metrics</h2>
-      <div class="metric-container">
-        <div class="metric">
-          <h3>Median List Price</h3>
-          <p id="medianList">$0 <span id="medianListArrow"></span></p>
+    <header>
+        <div class="header-content">
+            <div class="header-row">
+                <div>
+                    <h1>
+                        <i class="fas fa-chart-line"></i>
+                        Houston County Real Estate Dashboard
+                        <span id="version">v2.0</span>
+                    </h1>
+                    <p style="color: #cbd5e1; font-size: 0.95rem; margin-top: 0.25rem;">
+                        Professional market analysis and trend visualization
+                    </p>
+                </div>
+                
+                <div class="zip-selector">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <label for="zipSelect">Select ZIP Code:</label>
+                    <select id="zipSelect">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+            </div>
         </div>
-        <div class="metric">
-          <h3>Median Sale Price</h3>
-          <p id="medianSale">$0 <span id="medianSaleArrow"></span></p>
-        </div>
-        <div class="metric">
-          <h3>Inventory</h3>
-          <p id="inventory">0 <span id="inventoryArrow"></span></p>
-        </div>
-        <div class="metric">
-          <h3>Trend</h3>
-          <p id="trend">N/A</p>
-        </div>
-      </div>
-    </section>
+    </header>
 
-    <section id="charts">
-      <h2>Trends</h2>
-      <canvas id="priceChart" width="600" height="250"></canvas>
-      <canvas id="inventoryChart" width="600" height="250"></canvas>
-    </section>
+    <main>
+        <!-- Market Metrics Section -->
+        <section id="metrics">
+            <h2><i class="fas fa-chart-bar"></i> Market Metrics</h2>
+            <div class="metric-container">
+                <div class="metric">
+                    <h3><i class="fas fa-tag"></i> Median List Price</h3>
+                    <p>
+                        <span class="value" id="medianList">$0</span>
+                        <span id="medianListArrow"></span>
+                    </p>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
+                        Current market listing price
+                    </p>
+                </div>
+                
+                <div class="metric">
+                    <h3><i class="fas fa-money-bill-wave"></i> Median Sale Price</h3>
+                    <p>
+                        <span class="value" id="medianSale">$0</span>
+                        <span id="medianSaleArrow"></span>
+                    </p>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
+                        Recent transaction price
+                    </p>
+                </div>
+                
+                <div class="metric">
+                    <h3><i class="fas fa-home"></i> Active Inventory</h3>
+                    <p>
+                        <span class="value" id="inventory">0</span>
+                        <span id="inventoryArrow"></span>
+                    </p>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
+                        Properties currently listed
+                    </p>
+                </div>
+                
+                <div class="metric">
+                    <h3><i class="fas fa-trending-up"></i> Market Trend</h3>
+                    <p>
+                        <span class="value" id="trend">N/A</span>
+                    </p>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
+                        Overall market direction
+                    </p>
+                </div>
+            </div>
+        </section>
 
-    <section id="insights">
-      <h2>Weekly Insights</h2>
-      <div id="insightsList" class="insight-cards"></div>
-    </section>
-  </main>
+        <!-- Charts Section -->
+        <section id="charts">
+            <h2><i class="fas fa-chart-line"></i> Market Trends</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>Price Trends Over Time</h3>
+                    <canvas id="priceChart"></canvas>
+                    <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
+                        Hover over points for detailed values
+                    </p>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Inventory Levels Over Time</h3>
+                    <canvas id="inventoryChart"></canvas>
+                    <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
+                        Hover over points for detailed values
+                    </p>
+                </div>
+            </div>
+        </section>
 
-  <script src="charts.js"></script>
-  <script>
-    const zipSelect = document.getElementById("zipSelect");
-    let allData = {};
-    const versionSpan = document.getElementById("version");
+        <!-- Insights Section -->
+        <section id="insights">
+            <h2><i class="fas fa-lightbulb"></i> Weekly Market Insights</h2>
+            <div id="insightsList" class="insight-cards">
+                <!-- Insights will be dynamically inserted here -->
+                <div class="insight-card neutral">
+                    <div class="insight-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <p class="insight-text">
+                        Select a ZIP code to view market insights for that area.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
 
-    // Update version dynamically (increment manually when code changes)
-    const DASHBOARD_VERSION = "v1.1";
-    versionSpan.innerText = DASHBOARD_VERSION;
+    <footer>
+        <p>© <span id="currentYear"></span> Real House Market Report (RHMR)</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+            Data updates weekly • Last updated: <span id="lastUpdated"></span>
+        </p>
+    </footer>
 
-    async function loadDataJSON() {
-      try {
-        const response = await fetch('data/houston-county-ga/market_all_zips.json');
-        allData = await response.json();
-
-        // Populate ZIP dropdown
-        zipSelect.innerHTML = '';
-        Object.keys(allData).forEach(zip => {
-          const option = document.createElement('option');
-          option.value = zip;
-          option.innerText = `${zip} - ${allData[zip].city}`;
-          zipSelect.appendChild(option);
+    <script src="charts.js"></script>
+    <script>
+        // DOM Elements
+        const zipSelect = document.getElementById('zipSelect');
+        let allData = {};
+        const DASHBOARD_VERSION = "v2.0";
+        
+        // Initialize
+        document.getElementById('version').textContent = DASHBOARD_VERSION;
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
         });
-
-        loadZIP(zipSelect.value);
-
-      } catch (err) {
-        console.error("Failed to load market JSON:", err);
-      }
-    }
-
-    function setArrow(elementId, change) {
-      const el = document.getElementById(elementId);
-      if (change > 0) el.innerHTML = '<span class="arrow up">⬆️</span>';
-      else if (change < 0) el.innerHTML = '<span class="arrow down">⬇️</span>';
-      else el.innerHTML = '<span class="arrow flat">➡️</span>';
-    }
-
-    function loadZIP(zip) {
-      const data = allData[zip];
-      if (!data) return;
-
-      // Metrics
-      const lastListChange = data.history.median_list.slice(-1)[0] - data.history.median_list.slice(-2)[0];
-      document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
-      setArrow("medianListArrow", lastListChange);
-
-      const lastSaleChange = data.history.median_sale ? data.history.median_sale.slice(-1)[0] - data.history.median_sale.slice(-2)[0] : 0;
-      document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
-      setArrow("medianSaleArrow", lastSaleChange);
-
-      const lastInventoryChange = data.history.inventory ? data.history.inventory.slice(-1)[0] - data.history.inventory.slice(-2)[0] : 0;
-      document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
-      setArrow("inventoryArrow", lastInventoryChange);
-
-      document.getElementById("trend").innerText = data.pricing.trend;
-
-      // Insights
-      const insightsDiv = document.getElementById("insightsList");
-      insightsDiv.innerHTML = '';
-      data.weekly_insights.forEach(point => {
-        const card = document.createElement("div");
-        card.className = "insight-card";
-        card.innerText = point.text || point; // fallback for older data
-        if(point.type === 'positive') card.classList.add('positive');
-        else if(point.type === 'negative') card.classList.add('negative');
-        else card.classList.add('neutral');
-        insightsDiv.appendChild(card);
-      });
-
-      // Charts
-      renderLine(
-        "priceChart",
-        data.history.median_list,
-        data.history.median_sale,
-        "Price ($)"
-      );
-
-      renderLine(
-        "inventoryChart",
-        data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active),
-        null,
-        "Inventory"
-      );
-    }
-
-    zipSelect.addEventListener("change", () => loadZIP(zipSelect.value));
-    loadDataJSON();
-  </script>
+        
+        // Load JSON data
+        async function loadDataJSON() {
+            try {
+                const loadingOption = zipSelect.querySelector('option');
+                loadingOption.textContent = 'Loading data...';
+                
+                const response = await fetch('data/houston-county-ga/market_all_zips.json');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                allData = await response.json();
+                
+                // Clear and populate ZIP dropdown
+                zipSelect.innerHTML = '';
+                Object.keys(allData).forEach(zip => {
+                    const zipData = allData[zip];
+                    const option = document.createElement('option');
+                    option.value = zip;
+                    option.textContent = `${zip} - ${zipData.city || 'Unknown City'}`;
+                    zipSelect.appendChild(option);
+                });
+                
+                // Select first ZIP by default
+                if (zipSelect.options.length > 0) {
+                    zipSelect.value = zipSelect.options[0].value;
+                    loadZIP(zipSelect.value);
+                }
+                
+            } catch (err) {
+                console.error('Failed to load market data:', err);
+                zipSelect.innerHTML = '<option value="">Error loading data</option>';
+                
+                // Show error in metrics
+                document.querySelectorAll('.metric .value').forEach(el => {
+                    el.textContent = 'Error';
+                });
+                
+                document.getElementById('insightsList').innerHTML = `
+                    <div class="insight-card negative">
+                        <div class="insight-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p class="insight-text">
+                            Failed to load market data. Please check the data file path and try again.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Set arrow indicator
+        function setArrow(elementId, change) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = '';
+            
+            if (change > 0) {
+                el.innerHTML = '<i class="fas fa-arrow-up arrow up"></i>';
+            } else if (change < 0) {
+                el.innerHTML = '<i class="fas fa-arrow-down arrow down"></i>';
+            } else {
+                el.innerHTML = '<i class="fas fa-minus arrow flat"></i>';
+            }
+        }
+        
+        // Load ZIP data
+        function loadZIP(zip) {
+            const data = allData[zip];
+            if (!data) return;
+            
+            // Update metrics with animations
+            const metrics = [
+                { id: 'medianList', value: data.pricing.median_list, change: data.history.median_list.slice(-1)[0] - data.history.median_list.slice(-2)[0] },
+                { id: 'medianSale', value: data.pricing.median_sale, change: data.history.median_sale ? data.history.median_sale.slice(-1)[0] - data.history.median_sale.slice(-2)[0] : 0 },
+                { id: 'inventory', value: data.inventory.active, change: data.history.inventory ? data.history.inventory.slice(-1)[0] - data.history.inventory.slice(-2)[0] : 0 }
+            ];
+            
+            metrics.forEach(metric => {
+                const element = document.getElementById(metric.id);
+                element.textContent = metric.id.includes('Price') ? `$${metric.value.toLocaleString()}` : metric.value.toLocaleString();
+                setArrow(`${metric.id}Arrow`, metric.change);
+            });
+            
+            // Update trend
+            document.getElementById('trend').textContent = data.pricing.trend || 'Stable';
+            
+            // Update insights
+            const insightsDiv = document.getElementById('insightsList');
+            insightsDiv.innerHTML = '';
+            
+            if (data.weekly_insights && data.weekly_insights.length > 0) {
+                data.weekly_insights.forEach(insight => {
+                    const card = document.createElement('div');
+                    card.className = `insight-card ${insight.type || 'neutral'}`;
+                    
+                    let icon = 'info-circle';
+                    if (insight.type === 'positive') icon = 'check-circle';
+                    if (insight.type === 'negative') icon = 'exclamation-triangle';
+                    
+                    card.innerHTML = `
+                        <div class="insight-icon">
+                            <i class="fas fa-${icon}"></i>
+                        </div>
+                        <p class="insight-text">${insight.text || insight}</p>
+                    `;
+                    
+                    insightsDiv.appendChild(card);
+                });
+            } else {
+                insightsDiv.innerHTML = `
+                    <div class="insight-card neutral">
+                        <div class="insight-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <p class="insight-text">
+                            No insights available for this ZIP code. Check back next week.
+                        </p>
+                    </div>
+                `;
+            }
+            
+            // Render charts
+            setTimeout(() => {
+                renderLine(
+                    'priceChart',
+                    data.history.median_list,
+                    data.history.median_sale || null,
+                    'Price Trends ($)'
+                );
+                
+                renderLine(
+                    'inventoryChart',
+                    data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active),
+                    null,
+                    'Inventory Count'
+                );
+            }, 100);
+            
+            // Update page title with selected ZIP
+            document.title = `ZIP ${zip} | Houston County Real Estate Dashboard`;
+        }
+        
+        // Event listeners
+        zipSelect.addEventListener('change', () => {
+            const selectedZip = zipSelect.value;
+            if (selectedZip) {
+                loadZIP(selectedZip);
+            }
+        });
+        
+        // Initialize on load
+        window.addEventListener('load', loadDataJSON);
+        window.addEventListener('resize', () => {
+            // Re-render charts on resize for responsiveness
+            const selectedZip = zipSelect.value;
+            if (selectedZip && allData[selectedZip]) {
+                loadZIP(selectedZip);
+            }
+        });
+    </script>
 </body>
 </html>
