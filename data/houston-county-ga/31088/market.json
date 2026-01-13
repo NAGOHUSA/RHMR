@@ -1,0 +1,25 @@
+{
+  "market": "Houston County, GA",
+  "zip": "31088",
+  "updated": "2026-01-13",
+  "period": "weekly",
+  "inventory": {
+    "active": 412,
+    "change_pct": 5.2
+  },
+  "pricing": {
+    "median_list": 289900,
+    "median_sale": 281400,
+    "spread_pct": -2.9,
+    "trend": "cooling"
+  },
+  "velocity": {
+    "avg_dom": 31,
+    "dom_change": 4,
+    "absorption_rate": 0.74
+  },
+  "signals": {
+    "seller_leverage": "neutral",
+    "price_reductions_up": true
+  }
+}
