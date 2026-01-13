@@ -1,4 +1,4 @@
-function renderLine(canvasId, data, label) {
+function renderLine(canvasId, listData, saleData = null, label) {
   const canvas = document.getElementById(canvasId);
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -6,11 +6,11 @@ function renderLine(canvasId, data, label) {
   const padding = 40;
   const width = canvas.width - padding * 2;
   const height = canvas.height - padding * 2;
-  const max = Math.max(...data);
-  const min = Math.min(...data);
 
-  // Trend color
-  const trendColor = data[data.length-1] >= data[0] ? "green" : "red";
+  let max = Math.max(...listData);
+  if(saleData) max = Math.max(max, ...saleData);
+  let min = Math.min(...listData);
+  if(saleData) min = Math.min(min, ...saleData);
 
   // Draw axes
   ctx.strokeStyle = "#ccc";
@@ -20,29 +20,52 @@ function renderLine(canvasId, data, label) {
   ctx.lineTo(canvas.width - padding, canvas.height - padding);
   ctx.stroke();
 
-  // Draw trend line
-  ctx.strokeStyle = trendColor;
+  // Draw median list line
+  ctx.strokeStyle = "green";
   ctx.lineWidth = 2;
   ctx.beginPath();
-  data.forEach((v, i) => {
-    const x = padding + (i * width) / (data.length - 1);
+  listData.forEach((v, i) => {
+    const x = padding + (i * width) / (listData.length - 1);
     const y = canvas.height - padding - ((v - min) / (max - min)) * height;
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   });
   ctx.stroke();
 
-  // Points with labels
-  ctx.fillStyle = trendColor;
-  ctx.font = "12px Arial";
-  data.forEach((v, i) => {
-    const x = padding + (i * width) / (data.length - 1);
+  // Draw median sale line if exists
+  if(saleData){
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    saleData.forEach((v, i) => {
+      const x = padding + (i * width) / (saleData.length - 1);
+      const y = canvas.height - padding - ((v - min) / (max - min)) * height;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  // Draw points
+  ctx.fillStyle = "green";
+  listData.forEach((v, i) => {
+    const x = padding + (i * width) / (listData.length - 1);
     const y = canvas.height - padding - ((v - min) / (max - min)) * height;
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillText(v.toLocaleString(), x - 15, y - 10);
   });
+
+  if(saleData){
+    ctx.fillStyle = "blue";
+    saleData.forEach((v, i) => {
+      const x = padding + (i * width) / (saleData.length - 1);
+      const y = canvas.height - padding - ((v - min) / (max - min)) * height;
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
 
   // Chart title
   ctx.fillStyle = "#1e3a8a";
