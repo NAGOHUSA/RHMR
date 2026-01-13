@@ -70,7 +70,7 @@ function renderLine(canvasId, listData, saleData = null, label) {
     ctx.stroke();
   }
 
-  // Draw points
+  // Draw points for median list
   ctx.fillStyle = "green";
   listData.forEach((v, i) => {
     const x = padding + (i * width) / (listData.length - 1);
@@ -80,6 +80,7 @@ function renderLine(canvasId, listData, saleData = null, label) {
     ctx.fill();
   });
 
+  // Draw points for sale
   if(saleData){
     ctx.fillStyle = "blue";
     saleData.forEach((v, i) => {
@@ -88,6 +89,25 @@ function renderLine(canvasId, listData, saleData = null, label) {
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, Math.PI * 2);
       ctx.fill();
+    });
+  }
+
+  // Draw points for inventory with color based on trend
+  if(label.toLowerCase().includes('inventory')) {
+    ctx.fillStyle = "gray"; // default first point
+    listData.forEach((v, i) => {
+      const x = padding + (i * width) / (listData.length - 1);
+      const y = canvas.height - padding - ((v - min) / (max - min)) * height;
+      if(i > 0){
+        const prev = listData[i-1];
+        if(v > prev) ctx.fillStyle = "green";       // rising
+        else if(v < prev) ctx.fillStyle = "red";    // falling
+        else ctx.fillStyle = "gray";                // flat
+      }
+      ctx.beginPath();
+      ctx.arc(x, y, 5, 0, Math.PI * 2);
+      ctx.fill();
+      points.push({x, y, value: v, type: 'Inventory', period: i + 1});
     });
   }
 
@@ -110,7 +130,10 @@ function renderLine(canvasId, listData, saleData = null, label) {
         tooltip.style.display = 'block';
         tooltip.style.left = (e.clientX + 10) + 'px';
         tooltip.style.top = (e.clientY + 10) + 'px';
-        tooltip.innerHTML = `${p.type} (Period ${p.period}): $${p.value.toLocaleString()}`;
+        if(p.type === 'Inventory')
+          tooltip.innerHTML = `${p.type} (Period ${p.period}): ${p.value}`;
+        else
+          tooltip.innerHTML = `${p.type} (Period ${p.period}): $${p.value.toLocaleString()}`;
         found = true;
       }
     });
