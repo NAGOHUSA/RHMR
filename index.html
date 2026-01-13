@@ -1,434 +1,252 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Real Estate Dashboard | RHMR Pro</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0/dist/chartjs-plugin-annotation.min.js"></script>
-</head>
-<body>
-    <!-- Real-Time Notification Bar -->
-    <div class="realtime-bar">
-        <div class="realtime-indicator">
-            <span class="pulse"></span>
-            <span>LIVE</span>
+import React, { useState, useEffect } from 'react';
+import { Home, TrendingUp, Clock, DollarSign, Activity, AlertCircle, BarChart3, MapPin } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+
+const RealEstateDashboard = () => {
+  const [selectedZip, setSelectedZip] = useState('31088');
+  const [timeRange, setTimeRange] = useState('live');
+  
+  // Sample data for charts
+  const priceData = [
+    { day: 'Mon', price: 285, inventory: 98 },
+    { day: 'Tue', price: 287, inventory: 102 },
+    { day: 'Wed', price: 288, inventory: 105 },
+    { day: 'Thu', price: 289, inventory: 108 },
+    { day: 'Fri', price: 290, inventory: 105 },
+    { day: 'Sat', price: 289, inventory: 103 },
+    { day: 'Sun', price: 290, inventory: 105 }
+  ];
+  
+  const activityData = [
+    { name: 'New', value: 12 },
+    { name: 'Pending', value: 8 },
+    { name: 'Sold', value: 15 },
+    { name: 'Reduced', value: 5 }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              RHMR Pro Dashboard
+            </h1>
+            <p className="text-slate-400 mt-2">Real-time market intelligence for Houston County</p>
+          </div>
+          <div className="flex gap-3">
+            <select 
+              value={selectedZip}
+              onChange={(e) => setSelectedZip(e.target.value)}
+              className="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white"
+            >
+              <option value="31088">31088 - Warner Robins</option>
+              <option value="31093">31093 - Centerville</option>
+              <option value="31098">31098 - Bonaire</option>
+            </select>
+          </div>
         </div>
-        <div class="realtime-update">
-            <i class="fas fa-sync-alt"></i>
-            Auto-updating every 10 minutes
-            <span id="lastUpdateTime">Just now</span>
+        
+        {/* Live indicator */}
+        <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-2 bg-red-500/20 px-4 py-2 rounded-full border border-red-500/50">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-red-400 font-semibold">LIVE</span>
+          </div>
+          <span className="text-slate-400">Updated just now</span>
         </div>
-        <div class="market-status">
-            <i class="fas fa-bullhorn"></i>
-            Market Status: <span id="marketStatus">Loading...</span>
+      </div>
+
+      {/* Market Pulse Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <Activity className="w-8 h-8 text-white/90" />
+            <span className="text-3xl font-bold">72°</span>
+          </div>
+          <h3 className="text-lg font-semibold mb-1">Market Temperature</h3>
+          <div className="flex items-center gap-2 text-sm text-white/80">
+            <TrendingUp className="w-4 h-4" />
+            <span>+3° since yesterday</span>
+          </div>
         </div>
+
+        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <TrendingUp className="w-8 h-8 text-white/90" />
+            <span className="text-3xl font-bold">85</span>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Velocity Score</h3>
+          <div className="w-full bg-white/20 rounded-full h-2">
+            <div className="bg-white rounded-full h-2" style={{width: '85%'}}></div>
+          </div>
+          <p className="text-sm text-white/80 mt-2">Fast-moving market</p>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <Activity className="w-8 h-8 text-white/90" />
+            <span className="text-3xl font-bold">65</span>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Leverage Index</h3>
+          <div className="flex items-center justify-between text-xs text-white/80">
+            <span>Buyer</span>
+            <span>Seller</span>
+          </div>
+          <div className="relative w-full bg-white/20 rounded-full h-2 mt-1">
+            <div className="absolute w-3 h-3 bg-white rounded-full -top-0.5" style={{left: '65%'}}></div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-4">
+            <AlertCircle className="w-8 h-8 text-white/90" />
+            <span className="text-3xl font-bold">78</span>
+          </div>
+          <h3 className="text-lg font-semibold mb-1">Opportunity Score</h3>
+          <div className="flex gap-1 text-yellow-300">
+            {'★★★★☆'.split('').map((star, i) => <span key={i} className="text-xl">{star}</span>)}
+          </div>
+          <p className="text-sm text-white/80 mt-1">Great for new agents</p>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <Home className="w-6 h-6 text-blue-400" />
+            <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">LIVE</span>
+          </div>
+          <h3 className="text-slate-400 text-sm mb-2">Active Listings</h3>
+          <div className="text-3xl font-bold mb-2">105</div>
+          <div className="flex items-center gap-1 text-green-400 text-sm">
+            <TrendingUp className="w-4 h-4" />
+            <span>+5 today</span>
+          </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <DollarSign className="w-6 h-6 text-green-400" />
+            <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">24H</span>
+          </div>
+          <h3 className="text-slate-400 text-sm mb-2">Median Price</h3>
+          <div className="text-3xl font-bold mb-2">$289,500</div>
+          <div className="flex items-center gap-1 text-green-400 text-sm">
+            <TrendingUp className="w-4 h-4" />
+            <span>+$1,200</span>
+          </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <Clock className="w-6 h-6 text-purple-400" />
+            <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded-full">TREND</span>
+          </div>
+          <h3 className="text-slate-400 text-sm mb-2">Days on Market</h3>
+          <div className="text-3xl font-bold mb-2">24</div>
+          <div className="flex items-center gap-1 text-green-400 text-sm">
+            <TrendingUp className="w-4 h-4" />
+            <span>-2 days</span>
+          </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <div className="flex items-center justify-between mb-4">
+            <BarChart3 className="w-6 h-6 text-cyan-400" />
+            <span className="text-xs bg-cyan-500/20 text-cyan-400 px-2 py-1 rounded-full">LIVE</span>
+          </div>
+          <h3 className="text-slate-400 text-sm mb-2">Price to List</h3>
+          <div className="text-3xl font-bold mb-2">98.7%</div>
+          <div className="flex items-center gap-1 text-green-400 text-sm">
+            <TrendingUp className="w-4 h-4" />
+            <span>+0.3%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-blue-400" />
+            Price & Inventory Trend
+          </h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={priceData}>
+              <defs>
+                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis dataKey="day" stroke="#94a3b8" />
+              <YAxis stroke="#94a3b8" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+              />
+              <Area type="monotone" dataKey="price" stroke="#3b82f6" fill="url(#colorPrice)" strokeWidth={2} />
+              <Line type="monotone" dataKey="inventory" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981' }} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+          <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <Activity className="w-5 h-5 text-purple-400" />
+            Market Activity
+          </h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={activityData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+              <XAxis dataKey="name" stroke="#94a3b8" />
+              <YAxis stroke="#94a3b8" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+              />
+              <Bar dataKey="value" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Insights Feed */}
+      <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+        <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+          <AlertCircle className="w-5 h-5 text-yellow-400" />
+          Live Market Insights
+        </h3>
+        <div className="space-y-4">
+          <div className="bg-slate-900 rounded-lg p-4 border-l-4 border-green-500">
+            <div className="flex items-start justify-between mb-2">
+              <h4 className="font-semibold text-green-400">📈 Price Momentum Building</h4>
+              <span className="text-xs text-slate-400">2 min ago</span>
+            </div>
+            <p className="text-slate-300 text-sm">3 consecutive days of price increases in Warner Robins. Consider adjusting listing strategies.</p>
+            <div className="flex gap-2 mt-3">
+              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Pricing</span>
+              <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Strategy</span>
+            </div>
+          </div>
+
+          <div className="bg-slate-900 rounded-lg p-4 border-l-4 border-blue-500">
+            <div className="flex items-start justify-between mb-2">
+              <h4 className="font-semibold text-blue-400">🎯 First-Time Buyer Activity</h4>
+              <span className="text-xs text-slate-400">15 min ago</span>
+            </div>
+            <p className="text-slate-300 text-sm">Increased search activity from first-time buyers in the $250-300k range.</p>
+            <div className="flex gap-2 mt-3">
+              <span className="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">Buyers</span>
+              <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">Opportunity</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  );
+};
 
-    <header>
-        <div class="header-content">
-            <div class="header-row">
-                <div class="header-title">
-                    <h1>
-                        <i class="fas fa-chart-line"></i>
-                        RHMR Pro - Real-Time Real Estate Intelligence
-                        <span class="version-badge">PRO v3.0</span>
-                    </h1>
-                    <p class="subtitle">Live market data & actionable insights for Houston County realtors</p>
-                </div>
-                
-                <div class="header-controls">
-                    <div class="time-selector">
-                        <button class="time-btn active" data-time="live">
-                            <i class="fas fa-bolt"></i> Live
-                        </button>
-                        <button class="time-btn" data-time="24h">
-                            <i class="fas fa-history"></i> 24H
-                        </button>
-                        <button class="time-btn" data-time="7d">
-                            <i class="fas fa-calendar-week"></i> 7D
-                        </button>
-                    </div>
-                    
-                    <div class="zip-selector">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <select id="zipSelect" multiple>
-                            <option value="31088" selected>31088 - Warner Robins</option>
-                            <option value="31093">31093 - Centerville</option>
-                            <option value="31098">31098 - Bonaire</option>
-                        </select>
-                        <button id="compareBtn" class="compare-btn">
-                            <i class="fas fa-chart-bar"></i> Compare
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main>
-        <!-- Real-Time Market Pulse -->
-        <section class="market-pulse">
-            <div class="pulse-header">
-                <h2><i class="fas fa-heartbeat"></i> Market Pulse</h2>
-                <div class="pulse-controls">
-                    <span class="refresh-btn" id="refreshData">
-                        <i class="fas fa-redo"></i> Refresh Now
-                    </span>
-                </div>
-            </div>
-            
-            <div class="pulse-grid">
-                <div class="pulse-card critical">
-                    <div class="pulse-icon">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="pulse-content">
-                        <h3>Market Temperature</h3>
-                        <div class="pulse-value" id="marketTemp">72°</div>
-                        <div class="pulse-trend">
-                            <span class="trend up"><i class="fas fa-arrow-up"></i> +3°</span>
-                            Since yesterday
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="pulse-card">
-                    <div class="pulse-icon">
-                        <i class="fas fa-bolt"></i>
-                    </div>
-                    <div class="pulse-content">
-                        <h3>Velocity Score</h3>
-                        <div class="pulse-value" id="velocityScore">85</div>
-                        <div class="pulse-meter">
-                            <div class="meter-bar" style="width: 85%"></div>
-                        </div>
-                        <div class="pulse-label">Fast-moving market</div>
-                    </div>
-                </div>
-                
-                <div class="pulse-card">
-                    <div class="pulse-icon">
-                        <i class="fas fa-balance-scale"></i>
-                    </div>
-                    <div class="pulse-content">
-                        <h3>Leverage Index</h3>
-                        <div class="pulse-value" id="leverageIndex">65</div>
-                        <div class="leverage-label">
-                            <span class="buyer">Buyer</span>
-                            <span class="scale">
-                                <span class="indicator" style="left: 65%"></span>
-                            </span>
-                            <span class="seller">Seller</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="pulse-card">
-                    <div class="pulse-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="pulse-content">
-                        <h3>Opportunity Score</h3>
-                        <div class="pulse-value" id="opportunityScore">78</div>
-                        <div class="opportunity-rating">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                            <i class="far fa-star"></i>
-                        </div>
-                        <div class="pulse-label">Great for new agents</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Real-Time Metrics Dashboard -->
-        <section class="realtime-metrics">
-            <h2><i class="fas fa-tachometer-alt"></i> Real-Time Metrics</h2>
-            
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <h3><i class="fas fa-home"></i> Active Listings</h3>
-                        <span class="metric-badge live">LIVE</span>
-                    </div>
-                    <div class="metric-value" id="activeListings">105</div>
-                    <div class="metric-change positive">
-                        <i class="fas fa-arrow-up"></i> +5 today
-                    </div>
-                    <div class="metric-chart-small">
-                        <canvas id="listingsChart" height="60"></canvas>
-                    </div>
-                </div>
-                
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <h3><i class="fas fa-money-bill-wave"></i> Median Price</h3>
-                        <span class="metric-badge">24H</span>
-                    </div>
-                    <div class="metric-value" id="medianPrice">$289,500</div>
-                    <div class="metric-change positive">
-                        <i class="fas fa-arrow-up"></i> +$1,200
-                    </div>
-                    <div class="metric-sub">Per sq ft: $142</div>
-                </div>
-                
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <h3><i class="fas fa-clock"></i> Days on Market</h3>
-                        <span class="metric-badge">TRENDING</span>
-                    </div>
-                    <div class="metric-value" id="avgDOM">24</div>
-                    <div class="metric-change negative">
-                        <i class="fas fa-arrow-down"></i> -2 days
-                    </div>
-                    <div class="metric-sub">Properties moving faster</div>
-                </div>
-                
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <h3><i class="fas fa-percentage"></i> Price to List</h3>
-                        <span class="metric-badge">LIVE</span>
-                    </div>
-                    <div class="metric-value" id="priceToList">98.7%</div>
-                    <div class="metric-change positive">
-                        <i class="fas fa-arrow-up"></i> +0.3%
-                    </div>
-                    <div class="metric-sub">Strong negotiation position</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Realtor Workflow Assistant -->
-        <section class="workflow-assistant">
-            <h2><i class="fas fa-hands-helping"></i> Realtor Workflow Assistant</h2>
-            
-            <div class="workflow-grid">
-                <div class="workflow-card">
-                    <div class="workflow-header">
-                        <i class="fas fa-user-graduate"></i>
-                        <h3>New Realtor Guide</h3>
-                    </div>
-                    <div class="workflow-steps">
-                        <div class="step active">
-                            <span class="step-number">1</span>
-                            <div class="step-content">
-                                <h4>Morning Market Review</h4>
-                                <p>Check new listings (12 today), review price changes</p>
-                                <button class="step-action">Mark Complete</button>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <span class="step-number">2</span>
-                            <div class="step-content">
-                                <h4>Client Updates</h4>
-                                <p>Send market reports to 3 active buyers</p>
-                                <button class="step-action">Start</button>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <span class="step-number">3</span>
-                            <div class="step-content">
-                                <h4>CMA Preparation</h4>
-                                <p>Generate 2 comparative market analyses</p>
-                                <button class="step-action">Start</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="workflow-card">
-                    <div class="workflow-header">
-                        <i class="fas fa-lightbulb"></i>
-                        <h3>Daily Opportunity Alert</h3>
-                    </div>
-                    <div class="opportunity-alert">
-                        <div class="alert-icon">
-                            <i class="fas fa-exclamation-circle"></i>
-                        </div>
-                        <div class="alert-content">
-                            <h4>🔥 Hot Opportunity</h4>
-                            <p>2 properties in 31088 just reduced price by 5%+. Great value for buyers!</p>
-                            <div class="alert-actions">
-                                <button class="alert-btn primary">
-                                    <i class="fas fa-eye"></i> View Properties
-                                </button>
-                                <button class="alert-btn">
-                                    <i class="fas fa-share"></i> Share with Clients
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="confidence-meter">
-                        <h4>Client Confidence Builder</h4>
-                        <div class="confidence-level">
-                            <div class="level-bar" style="width: 75%">
-                                <span class="level-text">75% Confidence Score</span>
-                            </div>
-                        </div>
-                        <p class="confidence-tip">Use today's market data to build client trust</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Real-Time Charts -->
-        <section class="realtime-charts">
-            <h2><i class="fas fa-chart-line"></i> Live Market Trends</h2>
-            
-            <div class="charts-grid">
-                <div class="chart-container large">
-                    <div class="chart-header">
-                        <h3>Price & Inventory Trend (Last 7 Days)</h3>
-                        <div class="chart-legend">
-                            <span class="legend-item price"><i class="fas fa-circle"></i> Price</span>
-                            <span class="legend-item inventory"><i class="fas fa-circle"></i> Inventory</span>
-                        </div>
-                    </div>
-                    <canvas id="priceInventoryChart"></canvas>
-                </div>
-                
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>Market Activity Heatmap</h3>
-                    </div>
-                    <canvas id="activityChart"></canvas>
-                </div>
-                
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h3>Realtor Success Indicators</h3>
-                    </div>
-                    <canvas id="successChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- Real-Time Insights Feed -->
-        <section class="insights-feed">
-            <h2><i class="fas fa-rss"></i> Live Market Insights</h2>
-            
-            <div class="insights-container">
-                <div class="insight-card new">
-                    <div class="insight-time">2 min ago</div>
-                    <div class="insight-content">
-                        <h4>📈 Price Momentum Building</h4>
-                        <p>3 consecutive days of price increases in Warner Robins. Consider adjusting listing strategies.</p>
-                        <div class="insight-tags">
-                            <span class="tag pricing">Pricing</span>
-                            <span class="tag strategy">Strategy</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="insight-card">
-                    <div class="insight-time">15 min ago</div>
-                    <div class="insight-content">
-                        <h4>🎯 First-Time Buyer Activity</h4>
-                        <p>Increased search activity from first-time buyers in the $250-300k range.</p>
-                        <div class="insight-tags">
-                            <span class="tag buyers">Buyers</span>
-                            <span class="tag opportunity">Opportunity</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="insight-card">
-                    <div class="insight-time">30 min ago</div>
-                    <div class="insight-content">
-                        <h4>🏠 New Listing Alert</h4>
-                        <p>5 new listings entered the market this morning. All priced competitively.</p>
-                        <div class="insight-tags">
-                            <span class="tag inventory">Inventory</span>
-                            <span class="tag new">New</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="insight-generator">
-                <h4><i class="fas fa-robot"></i> AI Insight Generator</h4>
-                <div class="generator-input">
-                    <input type="text" placeholder="Ask about market trends, pricing, or strategies...">
-                    <button class="generate-btn">
-                        <i class="fas fa-magic"></i> Generate Insight
-                    </button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Realtor Confidence Booster -->
-    <div class="confidence-booster">
-        <div class="booster-header">
-            <i class="fas fa-trophy"></i>
-            <h3>Realtor Confidence Builder</h3>
-        </div>
-        <div class="booster-content">
-            <div class="confidence-tip">
-                <h4>💡 Today's Pro Tip:</h4>
-                <p id="dailyTip">Use market velocity data to demonstrate your expertise to clients.</p>
-            </div>
-            <div class="confidence-metrics">
-                <div class="confidence-metric">
-                    <div class="metric-label">Market Knowledge</div>
-                    <div class="metric-value">92%</div>
-                </div>
-                <div class="confidence-metric">
-                    <div class="metric-label">Client Trust</div>
-                    <div class="metric-value">88%</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4><i class="fas fa-database"></i> Data Sources</h4>
-                <p>Zillow • Realtor.com • MLS • Public Records • Market Analysis</p>
-                <div class="data-status">
-                    <span class="status active"><i class="fas fa-circle"></i> All Systems Live</span>
-                    <span class="update-frequency">Updated every 10 minutes</span>
-                </div>
-            </div>
-            <div class="footer-section">
-                <h4><i class="fas fa-mobile-alt"></i> Mobile Ready</h4>
-                <p>Access your dashboard anywhere. Perfect for showings and client meetings.</p>
-                <div class="app-badges">
-                    <span class="badge"><i class="fas fa-qrcode"></i> Scan for Mobile</span>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© <span id="currentYear"></span> RHMR Pro - Real-Time Real Estate Intelligence</p>
-            <p>Designed to empower realtors with data-driven confidence</p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script src="realtime-dashboard.js"></script>
-    <script>
-        // Initialize real-time dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set current year
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-            
-            // Initialize real-time updates
-            initializeRealtimeDashboard();
-            
-            // Load initial data
-            loadDashboardData();
-            
-            // Start auto-refresh
-            startAutoRefresh();
-        });
-    </script>
-</body>
-</html>
+export default RealEstateDashboard;
