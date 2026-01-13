@@ -1,30 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Market Intelligence Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Houston County Market Dashboard</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<canvas id="inventoryChart" width="400" height="150"></canvas>
+  <header>
+    <h1>Houston County Real Estate Dashboard</h1>
+    <div>
+      <label for="zipSelect">Select ZIP:</label>
+      <select id="zipSelect">
+        <option value="31088" selected>31088 - Warner Robins</option>
+        <!-- Add more ZIPs here -->
+      </select>
+    </div>
+  </header>
 
-<header>
-  <h1>Market Intelligence</h1>
-  <select id="zipSelector"></select>
-  <p id="marketSummary"></p>
-</header>
+  <main>
+    <section id="metrics">
+      <h2>Market Metrics</h2>
+      <div class="metric-container">
+        <div class="metric">
+          <h3>Median List Price</h3>
+          <p id="medianList">$0</p>
+        </div>
+        <div class="metric">
+          <h3>Median Sale Price</h3>
+          <p id="medianSale">$0</p>
+        </div>
+        <div class="metric">
+          <h3>Inventory</h3>
+          <p id="inventory">0</p>
+        </div>
+        <div class="metric">
+          <h3>Trend</h3>
+          <p id="trend">N/A</p>
+        </div>
+      </div>
+    </section>
 
-<section class="grid">
-  <div class="card" id="inventoryCard"></div>
-  <div class="card" id="pricingCard"></div>
-  <div class="card" id="velocityCard"></div>
-</section>
+    <section id="charts">
+      <h2>Trends</h2>
+      <canvas id="priceChart" width="600" height="200"></canvas>
+      <canvas id="inventoryChart" width="600" height="200"></canvas>
+    </section>
 
-<section class="card">
-  <h2>Weekly Talking Points</h2>
-  <ul id="talkingPoints"></ul>
-</section>
+    <section id="insights">
+      <h2>Weekly Insights</h2>
+      <ul id="insightsList"></ul>
+    </section>
+  </main>
 
-<script src="market.js"></script>
+  <script src="charts.js"></script>
+  <script>
+    const zipSelect = document.getElementById("zipSelect");
+
+    async function loadData(zip) {
+      const response = await fetch(`../data/houston-county-ga/${zip}/processed/market.json`);
+      const data = await response.json();
+
+      // Metrics
+      document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
+      document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
+      document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
+      document.getElementById("trend").innerText = data.pricing.trend;
+
+      // Insights
+      const ul = document.getElementById("insightsList");
+      ul.innerHTML = "";
+      data.weekly_insights.forEach(point => {
+        const li = document.createElement("li");
+        li.innerText = point;
+        ul.appendChild(li);
+      });
+
+      // Charts
+      renderLine("priceChart", data.history.median_list);
+      renderLine("inventoryChart", data.history.inventory || [data.inventory.active, data.inventory.active, data.inventory.active]);
+    }
+
+    zipSelect.addEventListener("change", () => {
+      loadData(zipSelect.value);
+    });
+
+    // Initial load
+    loadData(zipSelect.value);
+  </script>
 </body>
 </html>
