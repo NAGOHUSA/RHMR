@@ -3,7 +3,7 @@ from pathlib import Path
 import time
 
 ZIP = "31088"
-BASE_DIR = Path(f"data/houston-county-ga/{ZIP}/raw")
+BASE_DIR = Path("/tmp")  # TEMP location, not versioned
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 
 URL = (
@@ -27,3 +27,5 @@ for attempt in range(1, MAX_RETRIES + 1):
         if attempt == MAX_RETRIES:
             raise
         time.sleep(5)
+
+print(f"Data saved to temporary path: {out_file}")
