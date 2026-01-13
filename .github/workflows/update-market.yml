@@ -1,56 +1,49 @@
-name: Update Market Data
+# [file name]: update-market.yml
+name: Update Real-Time Market Data
 
 on:
   schedule:
-    - cron: "0 10 * * 1"   # Mondays 10am UTC
+    - cron: "0 */6 * * *"   # Every 6 hours
+    - cron: "0 10 * * *"    # Daily at 10 AM
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
-  update:
+  real-time-update:
     runs-on: ubuntu-latest
-
+    
     steps:
-      # 1️⃣ Checkout repo
       - uses: actions/checkout@v4
-
-      # 2️⃣ Setup Python
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      # 3️⃣ Install dependencies
-      - name: Install Python dependencies
-        run: pip install requests
-
-      # 4️⃣ Fetch Zillow CSV (temp folder, not in repo)
-      - name: Fetch Zillow data
-        run: python scripts/fetch_redfin.py
-
-      # 5️⃣ Calculate metrics & write JSON to repo
-      - name: Calculate market metrics
-        run: python scripts/calculate_metrics.py
-
-      # 6️⃣ Generate weekly insights from JSON
-      - name: Generate weekly insights
-        run: python scripts/generate_insights.py
-
-      # 7️⃣ Generate zips.json (auto-detect all ZIPs)
-      - name: Generate zips.json
+      
+      - name: Install dependencies
         run: |
-          mkdir -p data/houston-county-ga
-          echo "[" > data/houston-county-ga/zips.json
-          find data/houston-county-ga -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | awk '{print "\"" $0 "\","}' >> data/houston-county-ga/zips.json
-          # Remove trailing comma
-          sed -i '$ s/,$//' data/houston-county-ga/zips.json
-          echo "]" >> data/houston-county-ga/zips.json
-
-      # 8️⃣ Commit only processed JSON + zips.json
-      - name: Commit processed JSON
+          pip install requests pandas textblob
+      
+      - name: Fetch real-time data
+        run: python scripts/fetch_real_time_data.py
+      
+      - name: Process and aggregate data
+        run: python scripts/process_real_time_data.py
+      
+      - name: Generate real-time insights
+        run: python scripts/generate_real_time_insights.py
+      
+      - name: Update dashboard data
         run: |
-          git config user.name "market-bot"
+          python scripts/update_dashboard_data.py
+      
+      - name: Commit and push updates
+        run: |
+          git config user.name "Market Data Bot"
           git config user.email "bot@github.com"
-          git add data/houston-county-ga/*/processed/market.json
-          git add data/houston-county-ga/zips.json
-          git commit -m "Weekly market update" || echo "No changes"
+          git add data/houston-county-ga/*/real_time/
+          git add data/houston-county-ga/*/processed/
+          git add data/houston-county-ga/dashboard_data.json
+          git commit -m "📊 Real-time market update $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
           git push
