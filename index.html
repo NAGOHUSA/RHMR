@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Houston County Market Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Houston County Real Estate Dashboard</h1>
+    <div>
+      <label for="zipSelect">Select ZIP:</label>
+      <select id="zipSelect"></select>
+    </div>
+  </header>
+
+  <main>
+    <section id="metrics">
+      <h2>Market Metrics</h2>
+      <div class="metric-container">
+        <div class="metric">
+          <h3>Median List Price</h3>
+          <p id="medianList">$0 <span id="medianListArrow"></span></p>
+        </div>
+        <div class="metric">
+          <h3>Median Sale Price</h3>
+          <p id="medianSale">$0 <span id="medianSaleArrow"></span></p>
+        </div>
+        <div class="metric">
+          <h3>Inventory</h3>
+          <p id="inventory">0 <span id="inventoryArrow"></span></p>
+        </div>
+        <div class="metric">
+          <h3>Trend</h3>
+          <p id="trend">N/A</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="charts">
+      <h2>Trends</h2>
+      <canvas id="priceChart" width="600" height="250"></canvas>
+      <canvas id="inventoryChart" width="600" height="250"></canvas>
+    </section>
+
+    <section id="insights">
+      <h2>Weekly Insights</h2>
+      <div id="insightsList" class="insight-cards"></div>
+    </section>
+  </main>
+
+  <script src="charts.js"></script>
+  <script>
+    const zipSelect = document.getElementById("zipSelect");
+
+    async function loadZIPs() {
+      const response = await fetch('data/houston-county-ga/zips.json');
+      const zips = await response.json();
+      zipSelect.innerHTML = '';
+      zips.forEach(zip => {
+        const option = document.createElement('option');
+        option.value = zip;
+        option.innerText = zip;
+        zipSelect.appendChild(option);
+      });
+      loadData(zipSelect.value);
+    }
+
+    function setArrow(elementId, change) {
+      const el = document.getElementById(elementId);
+      if (change > 0) el.innerHTML = '<span class="arrow up">⬆️</span>';
+      else if (change < 0) el.innerHTML = '<span class="arrow down">⬇️</span>';
+      else el.innerHTML = '<span class="arrow flat">➡️</span>';
+    }
+
+    async function loadData(zip) {
+      try {
+        const response = await fetch(`data/houston-county-ga/${zip}/processed/market.json`);
+        const data = await response.json();
+
+        // Metrics
+        const lastPriceChange = data.history.median_list[data.history.median_list.length-1] - data.history.median_list[data.history.median_list.length-2];
+        document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
+        setArrow("medianListArrow", lastPriceChange);
+
+        document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
+        setArrow("medianSaleArrow", data.pricing.median_sale - data.pricing.median_list);
+
+        document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
+        setArrow("inventoryArrow", data.inventory.change_pct);
+
+        document.getElementById("trend").innerText = data.pricing.trend;
+
+        // Insights cards
+        const insightsDiv = document.getElementById("insightsList");
+        insightsDiv.innerHTML = '';
+        data.weekly_insights.forEach(point => {
+          const card = document.createElement("div");
+          card.className = "insight-card";
+          card.innerText = point.text;
+          if(point.type === 'positive') card.classList.add('positive');
+          else if(point.type === 'negative') card.classList.add('negative');
+          else card.classList.add('neutral');
+          insightsDiv.appendChild(card);
+        });
+
+        // Charts with trend coloring
+        renderLine("priceChart", data.history.median_list, "Median List Price ($)");
+        renderLine("inventoryChart", data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active), "Inventory");
+
+      } catch (err) {
+        console.error("Error loading data:", err);
+      }
+    }
+
+    zipSelect.addEventListener("change", () => loadData(zipSelect.value));
+    loadZIPs();
+  </script>
+</body>
+</html>
