@@ -1,0 +1,71 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f7f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #1e3a8a;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header select {
+  font-size: 1rem;
+  padding: 0.3rem;
+}
+
+.metric-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.metric {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  flex: 1 1 200px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.arrow.up { color: green; }
+.arrow.down { color: red; }
+.arrow.flat { color: gray; }
+
+section h2 { margin-top: 2rem; margin-bottom: 1rem; }
+
+canvas {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.insight-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.insight-card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  flex: 1 1 250px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+.insight-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.insight-card.positive { border-left: 5px solid green; }
+.insight-card.negative { border-left: 5px solid red; }
+.insight-card.neutral { border-left: 5px solid gray; }
