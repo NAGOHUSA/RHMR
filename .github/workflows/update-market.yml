@@ -35,20 +35,22 @@ jobs:
       - name: Generate weekly insights
         run: python scripts/generate_insights.py
 
-      # 7️⃣ Commit only processed JSON files (ignore raw CSV)
+      # 7️⃣ Generate zips.json (auto-detect all ZIPs)
+      - name: Generate zips.json
+        run: |
+          mkdir -p data/houston-county-ga
+          echo "[" > data/houston-county-ga/zips.json
+          find data/houston-county-ga -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | awk '{print "\"" $0 "\","}' >> data/houston-county-ga/zips.json
+          # Remove trailing comma
+          sed -i '$ s/,$//' data/houston-county-ga/zips.json
+          echo "]" >> data/houston-county-ga/zips.json
+
+      # 8️⃣ Commit only processed JSON + zips.json
       - name: Commit processed JSON
         run: |
           git config user.name "market-bot"
           git config user.email "bot@github.com"
           git add data/houston-county-ga/*/processed/market.json
+          git add data/houston-county-ga/zips.json
           git commit -m "Weekly market update" || echo "No changes"
           git push
-
-    - name: Generate zips.json
-  run: |
-    echo "[" > data/houston-county-ga/zips.json
-    find data/houston-county-ga -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | awk '{print "\"" $0 "\","}' >> data/houston-county-ga/zips.json
-    # Remove trailing comma
-    sed -i '$ s/,$//' data/houston-county-ga/zips.json
-    echo "]" >> data/houston-county-ga/zips.json
-
