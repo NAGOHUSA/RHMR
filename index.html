@@ -4,10 +4,28 @@
   <meta charset="UTF-8">
   <title>Houston County Market Dashboard</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Optional simple styles for cards and arrows */
+    .metric-container { display: flex; gap: 20px; flex-wrap: wrap; }
+    .metric { background: #f5f5f5; padding: 10px 15px; border-radius: 6px; flex: 1 1 150px; }
+    .arrow.up { color: green; } 
+    .arrow.down { color: red; } 
+    .arrow.flat { color: gray; }
+    .insight-cards { display: flex; gap: 10px; flex-wrap: wrap; }
+    .insight-card { padding: 10px 15px; border-radius: 6px; background: #eee; flex: 1 1 200px; }
+    .positive { border-left: 5px solid green; }
+    .negative { border-left: 5px solid red; }
+    .neutral { border-left: 5px solid gray; }
+    header h1 { display: flex; justify-content: space-between; align-items: center; }
+    #version { font-size: 0.9em; color: #555; margin-left: 15px; }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Houston County Real Estate Dashboard</h1>
+    <h1>
+      Houston County Real Estate Dashboard
+      <span id="version">v1.0</span>
+    </h1>
     <div>
       <label for="zipSelect">Select ZIP:</label>
       <select id="zipSelect"></select>
@@ -53,6 +71,11 @@
   <script>
     const zipSelect = document.getElementById("zipSelect");
     let allData = {};
+    const versionSpan = document.getElementById("version");
+
+    // Update version dynamically (increment manually when code changes)
+    const DASHBOARD_VERSION = "v1.1";
+    versionSpan.innerText = DASHBOARD_VERSION;
 
     async function loadDataJSON() {
       try {
@@ -107,6 +130,31 @@
       data.weekly_insights.forEach(point => {
         const card = document.createElement("div");
         card.className = "insight-card";
-        card.innerText = point.text;
+        card.innerText = point.text || point; // fallback for older data
         if(point.type === 'positive') card.classList.add('positive');
-        else if(point.type === 'negative') card.
+        else if(point.type === 'negative') card.classList.add('negative');
+        else card.classList.add('neutral');
+        insightsDiv.appendChild(card);
+      });
+
+      // Charts
+      renderLine(
+        "priceChart",
+        data.history.median_list,
+        data.history.median_sale,
+        "Price ($)"
+      );
+
+      renderLine(
+        "inventoryChart",
+        data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active),
+        null,
+        "Inventory"
+      );
+    }
+
+    zipSelect.addEventListener("change", () => loadZIP(zipSelect.value));
+    loadDataJSON();
+  </script>
+</body>
+</html>
