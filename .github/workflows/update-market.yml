@@ -8,30 +8,38 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
+      # 1️⃣ Checkout repo
       - uses: actions/checkout@v4
 
+      # 2️⃣ Setup Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install deps
+      # 3️⃣ Install dependencies
+      - name: Install Python dependencies
         run: pip install requests
 
-      - name: Fetch data
+      # 4️⃣ Fetch Zillow CSV (temp folder, not in repo)
+      - name: Fetch Zillow data
         run: python scripts/fetch_redfin.py
 
-      - name: Calculate metrics
+      # 5️⃣ Calculate metrics & write JSON to repo
+      - name: Calculate market metrics
         run: python scripts/calculate_metrics.py
 
-      - name: Generate insights
+      # 6️⃣ Generate weekly insights from JSON
+      - name: Generate weekly insights
         run: python scripts/generate_insights.py
 
-      - name: Commit updates
+      # 7️⃣ Commit only processed JSON files (ignore raw CSV)
+      - name: Commit processed JSON
         run: |
           git config user.name "market-bot"
           git config user.email "bot@github.com"
-          git add data/
+          git add data/houston-county-ga/*/processed/market.json
           git commit -m "Weekly market update" || echo "No changes"
           git push
