@@ -26,15 +26,12 @@
     "inventory_rising": false
   },
   "history": {
-    "median_list": [
-      229473.28968842313,
-      230128.7856377076,
-      230862.8763504316,
-      231740.03013827512
-    ]
+    "median_list": [229473, 230129, 230863, 231740],
+    "median_sale": [225000, 226000, 223500, 224787],
+    "inventory": [260, 262, 265, 263]
   },
   "weekly_insights": [
-    "Inventory is stable compared to last period.",
-    "Home prices are trending upward; sellers may get top dollar."
+    {"text": "Inventory is stable compared to last period.", "type": "neutral"},
+    {"text": "Home prices are trending upward; sellers may get top dollar.", "type": "positive"}
   ]
 }
