@@ -1,0 +1,187 @@
+{
+  "31088": {
+    "market": "Houston County, GA",
+    "zip": "31088",
+    "city": "Warner Robins",
+    "updated": "2026-01-13",
+    "period": "monthly",
+    "inventory": {
+      "active": 263,
+      "change_pct": -0.4
+    },
+    "pricing": {
+      "median_list": 231740,
+      "median_sale": 224787,
+      "spread_pct": -3.0,
+      "trend": "heating"
+    },
+    "velocity": {
+      "avg_dom": 22,
+      "dom_change": -2,
+      "absorption_rate": 1.1,
+      "months_supply": 2.8
+    },
+    "signals": {
+      "seller_leverage": "seller",
+      "price_reductions_up": false,
+      "inventory_rising": false
+    },
+    "history": {
+      "median_list": [229473, 230129, 230863, 231740],
+      "median_sale": [225000, 226000, 223500, 224787],
+      "inventory": [260, 262, 265, 263]
+    },
+    "weekly_insights": [
+      {"text": "Inventory is stable compared to last period.", "type": "neutral"},
+      {"text": "Home prices are trending upward; sellers may get top dollar.", "type": "positive"}
+    ]
+  },
+  "31093": {
+    "market": "Houston County, GA",
+    "zip": "31093",
+    "city": "Perry",
+    "updated": "2026-01-13",
+    "period": "monthly",
+    "inventory": {
+      "active": 178,
+      "change_pct": 1.1
+    },
+    "pricing": {
+      "median_list": 218450,
+      "median_sale": 212300,
+      "spread_pct": -2.8,
+      "trend": "heating"
+    },
+    "velocity": {
+      "avg_dom": 25,
+      "dom_change": -1,
+      "absorption_rate": 1.05,
+      "months_supply": 3.1
+    },
+    "signals": {
+      "seller_leverage": "seller",
+      "price_reductions_up": false,
+      "inventory_rising": true
+    },
+    "history": {
+      "median_list": [216500, 217200, 218000, 218450],
+      "median_sale": [210000, 211000, 212000, 212300],
+      "inventory": [175, 176, 177, 178]
+    },
+    "weekly_insights": [
+      {"text": "Slight increase in inventory this period.", "type": "neutral"},
+      {"text": "Home prices continue to trend upward; buyers may compete for listings.", "type": "positive"}
+    ]
+  },
+  "31098": {
+    "market": "Houston County, GA",
+    "zip": "31098",
+    "city": "Centerville",
+    "updated": "2026-01-13",
+    "period": "monthly",
+    "inventory": {
+      "active": 145,
+      "change_pct": -0.7
+    },
+    "pricing": {
+      "median_list": 207320,
+      "median_sale": 202500,
+      "spread_pct": -2.4,
+      "trend": "heating"
+    },
+    "velocity": {
+      "avg_dom": 27,
+      "dom_change": -2,
+      "absorption_rate": 1.0,
+      "months_supply": 3.0
+    },
+    "signals": {
+      "seller_leverage": "seller",
+      "price_reductions_up": false,
+      "inventory_rising": false
+    },
+    "history": {
+      "median_list": [205000, 206200, 206900, 207320],
+      "median_sale": [200000, 201500, 202000, 202500],
+      "inventory": [148, 147, 146, 145]
+    },
+    "weekly_insights": [
+      {"text": "Slight decline in inventory; market remains tight.", "type": "neutral"},
+      {"text": "Prices rising moderately; sellers have leverage.", "type": "positive"}
+    ]
+  },
+  "31047": {
+    "market": "Houston County, GA",
+    "zip": "31047",
+    "city": "Kathleen",
+    "updated": "2026-01-13",
+    "period": "monthly",
+    "inventory": {
+      "active": 92,
+      "change_pct": 0
+    },
+    "pricing": {
+      "median_list": 195600,
+      "median_sale": 191000,
+      "spread_pct": -2.3,
+      "trend": "heating"
+    },
+    "velocity": {
+      "avg_dom": 30,
+      "dom_change": 0,
+      "absorption_rate": 0.95,
+      "months_supply": 3.2
+    },
+    "signals": {
+      "seller_leverage": "seller",
+      "price_reductions_up": false,
+      "inventory_rising": false
+    },
+    "history": {
+      "median_list": [194000, 194800, 195300, 195600],
+      "median_sale": [190000, 190500, 190800, 191000],
+      "inventory": [92, 92, 92, 92]
+    },
+    "weekly_insights": [
+      {"text": "Inventory remains stable.", "type": "neutral"},
+      {"text": "Sellers still have advantage; prices trending up.", "type": "positive"}
+    ]
+  },
+  "31005": {
+    "market": "Houston County, GA",
+    "zip": "31005",
+    "city": "Bonaire",
+    "updated": "2026-01-13",
+    "period": "monthly",
+    "inventory": {
+      "active": 110,
+      "change_pct": 0.9
+    },
+    "pricing": {
+      "median_list": 189400,
+      "median_sale": 185200,
+      "spread_pct": -2.2,
+      "trend": "heating"
+    },
+    "velocity": {
+      "avg_dom": 33,
+      "dom_change": -1,
+      "absorption_rate": 0.9,
+      "months_supply": 3.6
+    },
+    "signals": {
+      "seller_leverage": "seller",
+      "price_reductions_up": false,
+      "inventory_rising": true
+    },
+    "history": {
+      "median_list": [187500, 188200, 188900, 189400],
+      "median_sale": [183500, 184000, 184700, 185200],
+      "inventory": [108, 109, 109, 110]
+    },
+    "weekly_insights": [
+      {"text": "Inventory rising slightly; buyers have more options.", "type": "neutral"},
+      {"text": "Prices continue moderate upward trend.", "type": "positive"}
+    ]
+  }
+}
