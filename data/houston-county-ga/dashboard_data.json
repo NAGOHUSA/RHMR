@@ -1,0 +1,38 @@
+{
+  "last_updated": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+  "zip_codes": [
+    {
+      "zip": "31088",
+      "city": "Warner Robins",
+      "metrics": {
+        "composite_price": 289500,
+        "composite_inventory": 105,
+        "market_velocity": 85,
+        "price_momentum": 0.3,
+        "buyer_seller_index": 65,
+        "opportunity_score": 78
+      }
+    }
+  ],
+  "market_summary": {
+    "avg_price": 289500,
+    "total_inventory": 105,
+    "avg_opportunity_score": 78,
+    "market_trend": "heating",
+    "best_opportunity_zip": "31088"
+  },
+  "trends_24h": {
+    "price_movement": "+0.3%",
+    "inventory_change": "+5 listings",
+    "new_listings_today": "12",
+    "pending_sales": "8",
+    "avg_dom_trend": "↓ 2 days",
+    "market_pulse": "Moderate Activity"
+  },
+  "realtor_tips": [
+    "🔥 **High Opportunity Market**: Great time for new listings!",
+    "📈 Consider pricing slightly above market to test appetite",
+    "🤝 Focus on seller representation - high demand expected",
+    "🎯 Target first-time homebuyer programs for quick sales"
+  ]
+}
