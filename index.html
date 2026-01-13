@@ -3,305 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Houston County Real Estate Dashboard | RHMR</title>
+    <title>Real-Time Real Estate Dashboard | RHMR Pro</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/48/000000/home--v1.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
 <body>
+    <!-- Real-Time Notification Bar -->
+    <div class="realtime-bar">
+        <div class="realtime-indicator">
+            <span class="pulse"></span>
+            <span>LIVE</span>
+        </div>
+        <div class="realtime-update">
+            <i class="fas fa-sync-alt"></i>
+            Auto-updating every 10 minutes
+            <span id="lastUpdateTime">Just now</span>
+        </div>
+        <div class="market-status">
+            <i class="fas fa-bullhorn"></i>
+            Market Status: <span id="marketStatus">Loading...</span>
+        </div>
+    </div>
+
     <header>
         <div class="header-content">
             <div class="header-row">
-                <div>
+                <div class="header-title">
                     <h1>
                         <i class="fas fa-chart-line"></i>
-                        Houston County Real Estate Dashboard
-                        <span id="version">v2.0</span>
+                        RHMR Pro - Real-Time Real Estate Intelligence
+                        <span class="version-badge">PRO v3.0</span>
                     </h1>
-                    <p style="color: #cbd5e1; font-size: 0.95rem; margin-top: 0.25rem;">
-                        Professional market analysis and trend visualization
-                    </p>
+                    <p class="subtitle">Live market data & actionable insights for Houston County realtors</p>
                 </div>
                 
-                <div class="zip-selector">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <label for="zipSelect">Select ZIP Code:</label>
-                    <select id="zipSelect">
-                        <option value="">Loading...</option>
-                    </select>
+                <div class="header-controls">
+                    <div class="time-selector">
+                        <button class="time-btn active" data-time="live">
+                            <i class="fas fa-bolt"></i> Live
+                        </button>
+                        <button class="time-btn" data-time="24h">
+                            <i class="fas fa-history"></i> 24H
+                        </button>
+                        <button class="time-btn" data-time="7d">
+                            <i class="fas fa-calendar-week"></i> 7D
+                        </button>
+                    </div>
+                    
+                    <div class="zip-selector">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <select id="zipSelect" multiple>
+                            <option value="31088" selected>31088 - Warner Robins</option>
+                            <option value="31093">31093 - Centerville</option>
+                            <option value="31098">31098 - Bonaire</option>
+                        </select>
+                        <button id="compareBtn" class="compare-btn">
+                            <i class="fas fa-chart-bar"></i> Compare
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </header>
 
     <main>
-        <!-- Market Metrics Section -->
-        <section id="metrics">
-            <h2><i class="fas fa-chart-bar"></i> Market Metrics</h2>
-            <div class="metric-container">
-                <div class="metric">
-                    <h3><i class="fas fa-tag"></i> Median List Price</h3>
-                    <p>
-                        <span class="value" id="medianList">$0</span>
-                        <span id="medianListArrow"></span>
-                    </p>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
-                        Current market listing price
-                    </p>
-                </div>
-                
-                <div class="metric">
-                    <h3><i class="fas fa-money-bill-wave"></i> Median Sale Price</h3>
-                    <p>
-                        <span class="value" id="medianSale">$0</span>
-                        <span id="medianSaleArrow"></span>
-                    </p>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
-                        Recent transaction price
-                    </p>
-                </div>
-                
-                <div class="metric">
-                    <h3><i class="fas fa-home"></i> Active Inventory</h3>
-                    <p>
-                        <span class="value" id="inventory">0</span>
-                        <span id="inventoryArrow"></span>
-                    </p>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
-                        Properties currently listed
-                    </p>
-                </div>
-                
-                <div class="metric">
-                    <h3><i class="fas fa-trending-up"></i> Market Trend</h3>
-                    <p>
-                        <span class="value" id="trend">N/A</span>
-                    </p>
-                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">
-                        Overall market direction
-                    </p>
+        <!-- Real-Time Market Pulse -->
+        <section class="market-pulse">
+            <div class="pulse-header">
+                <h2><i class="fas fa-heartbeat"></i> Market Pulse</h2>
+                <div class="pulse-controls">
+                    <span class="refresh-btn" id="refreshData">
+                        <i class="fas fa-redo"></i> Refresh Now
+                    </span>
                 </div>
             </div>
-        </section>
-
-        <!-- Charts Section -->
-        <section id="charts">
-            <h2><i class="fas fa-chart-line"></i> Market Trends</h2>
-            <div class="charts-grid">
-                <div class="chart-container">
-                    <h3>Price Trends Over Time</h3>
-                    <canvas id="priceChart"></canvas>
-                    <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
-                        Hover over points for detailed values
-                    </p>
-                </div>
-                
-                <div class="chart-container">
-                    <h3>Inventory Levels Over Time</h3>
-                    <canvas id="inventoryChart"></canvas>
-                    <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-top: 0.5rem;">
-                        Hover over points for detailed values
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Insights Section -->
-        <section id="insights">
-            <h2><i class="fas fa-lightbulb"></i> Weekly Market Insights</h2>
-            <div id="insightsList" class="insight-cards">
-                <!-- Insights will be dynamically inserted here -->
-                <div class="insight-card neutral">
-                    <div class="insight-icon">
-                        <i class="fas fa-info-circle"></i>
+            
+            <div class="pulse-grid">
+                <div class="pulse-card critical">
+                    <div class="pulse-icon">
+                        <i class="fas fa-fire"></i>
                     </div>
-                    <p class="insight-text">
-                        Select a ZIP code to view market insights for that area.
-                    </p>
+                    <div class="pulse-content">
+                        <h3>Market Temperature</h3>
+                        <div class="pulse-value" id="marketTemp">72°</div>
+                        <div class="pulse-trend">
+                            <span class="trend up"><i class="fas fa-arrow-up"></i> +3°</span>
+                            Since yesterday
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pulse-card">
+                    <div class="pulse-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="pulse-content">
+                        <h3>Velocity Score</h3>
+                        <div class="pulse-value" id="velocityScore">85</div>
+                        <div class="pulse-meter">
+                            <div class="meter-bar" style="width: 85%"></div>
+                        </div>
+                        <div class="pulse-label">Fast-moving market</div>
+                    </div>
+                </div>
+                
+                <div class="pulse-card">
+                    <div class="pulse-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="pulse-content">
+                        <h3>Leverage Index</h3>
+                        <div class="pulse-value" id="leverageIndex">65</div>
+                        <div class="leverage-label">
+                            <span class="buyer">Buyer</span>
+                            <span class="scale">
+                                <span class="indicator" style="left: 65%"></span>
+                            </span>
+                            <span class="seller">Seller</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pulse-card">
+                    <div class="pulse-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="pulse-content">
+                        <h3>Opportunity Score</h3>
+                        <div class="pulse-value" id="opportunityScore">78</div>
+                        <div class="opportunity-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div class="pulse-label">Great for new agents</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-Time Metrics Dashboard -->
+        <section class="realtime-metrics">
+            <h2><i class="fas fa-tachometer-alt"></i> Real-Time Metrics</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3><i class="fas fa-home"></i> Active Listings</h3>
+                        <span class="metric-badge live">LIVE</span>
+                    </div>
+                    <div class="metric-value" id="activeListings">105</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i> +5 today
+                    </div>
+                    <div class="metric-chart-small">
+                        <canvas id="listingsChart" height="60"></canvas>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3><i class="fas fa-money-bill-wave"></i> Median Price</h3>
+                        <span class="metric-badge">24H</span>
+                    </div>
+                    <div class="metric-value" id="medianPrice">$289,500</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i> +$1,200
+                    </div>
+                    <div class="metric-sub">Per sq ft: $142</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3><i class="fas fa-clock"></i> Days on Market</h3>
+                        <span class="metric-badge">TRENDING</span>
+                    </div>
+                    <div class="metric-value" id="avgDOM">24</div>
+                    <div class="metric-change negative">
+                        <i class="fas fa-arrow-down"></i> -2 days
+                    </div>
+                    <div class="metric-sub">Properties moving faster</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3><i class="fas fa-percentage"></i> Price to List</h3>
+                        <span class="metric-badge">LIVE</span>
+                    </div>
+                    <div class="metric-value" id="priceToList">98.7%</div>
+                    <div class="metric-change positive">
+                        <i class="fas fa-arrow-up"></i> +0.3%
+                    </div>
+                    <div class="metric-sub">Strong negotiation position</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Realtor Workflow Assistant -->
+        <section class="workflow-assistant">
+            <h2><i class="fas fa-hands-helping"></i> Realtor Workflow Assistant</h2>
+            
+            <div class="workflow-grid">
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <i class="fas fa-user-graduate"></i>
+                        <h3>New Realtor Guide</h3>
+                    </div>
+                    <div class="workflow-steps">
+                        <div class="step active">
+                            <span class="step-number">1</span>
+                            <div class="step-content">
+                                <h4>Morning Market Review</h4>
+                                <p>Check new listings (12 today), review price changes</p>
+                                <button class="step-action">Mark Complete</button>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">2</span>
+                            <div class="step-content">
+                                <h4>Client Updates</h4>
+                                <p>Send market reports to 3 active buyers</p>
+                                <button class="step-action">Start</button>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <span class="step-number">3</span>
+                            <div class="step-content">
+                                <h4>CMA Preparation</h4>
+                                <p>Generate 2 comparative market analyses</p>
+                                <button class="step-action">Start</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="workflow-card">
+                    <div class="workflow-header">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>Daily Opportunity Alert</h3>
+                    </div>
+                    <div class="opportunity-alert">
+                        <div class="alert-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>🔥 Hot Opportunity</h4>
+                            <p>2 properties in 31088 just reduced price by 5%+. Great value for buyers!</p>
+                            <div class="alert-actions">
+                                <button class="alert-btn primary">
+                                    <i class="fas fa-eye"></i> View Properties
+                                </button>
+                                <button class="alert-btn">
+                                    <i class="fas fa-share"></i> Share with Clients
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="confidence-meter">
+                        <h4>Client Confidence Builder</h4>
+                        <div class="confidence-level">
+                            <div class="level-bar" style="width: 75%">
+                                <span class="level-text">75% Confidence Score</span>
+                            </div>
+                        </div>
+                        <p class="confidence-tip">Use today's market data to build client trust</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-Time Charts -->
+        <section class="realtime-charts">
+            <h2><i class="fas fa-chart-line"></i> Live Market Trends</h2>
+            
+            <div class="charts-grid">
+                <div class="chart-container large">
+                    <div class="chart-header">
+                        <h3>Price & Inventory Trend (Last 7 Days)</h3>
+                        <div class="chart-legend">
+                            <span class="legend-item price"><i class="fas fa-circle"></i> Price</span>
+                            <span class="legend-item inventory"><i class="fas fa-circle"></i> Inventory</span>
+                        </div>
+                    </div>
+                    <canvas id="priceInventoryChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Market Activity Heatmap</h3>
+                    </div>
+                    <canvas id="activityChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3>Realtor Success Indicators</h3>
+                    </div>
+                    <canvas id="successChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real-Time Insights Feed -->
+        <section class="insights-feed">
+            <h2><i class="fas fa-rss"></i> Live Market Insights</h2>
+            
+            <div class="insights-container">
+                <div class="insight-card new">
+                    <div class="insight-time">2 min ago</div>
+                    <div class="insight-content">
+                        <h4>📈 Price Momentum Building</h4>
+                        <p>3 consecutive days of price increases in Warner Robins. Consider adjusting listing strategies.</p>
+                        <div class="insight-tags">
+                            <span class="tag pricing">Pricing</span>
+                            <span class="tag strategy">Strategy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-time">15 min ago</div>
+                    <div class="insight-content">
+                        <h4>🎯 First-Time Buyer Activity</h4>
+                        <p>Increased search activity from first-time buyers in the $250-300k range.</p>
+                        <div class="insight-tags">
+                            <span class="tag buyers">Buyers</span>
+                            <span class="tag opportunity">Opportunity</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-time">30 min ago</div>
+                    <div class="insight-content">
+                        <h4>🏠 New Listing Alert</h4>
+                        <p>5 new listings entered the market this morning. All priced competitively.</p>
+                        <div class="insight-tags">
+                            <span class="tag inventory">Inventory</span>
+                            <span class="tag new">New</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insight-generator">
+                <h4><i class="fas fa-robot"></i> AI Insight Generator</h4>
+                <div class="generator-input">
+                    <input type="text" placeholder="Ask about market trends, pricing, or strategies...">
+                    <button class="generate-btn">
+                        <i class="fas fa-magic"></i> Generate Insight
+                    </button>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Realtor Confidence Booster -->
+    <div class="confidence-booster">
+        <div class="booster-header">
+            <i class="fas fa-trophy"></i>
+            <h3>Realtor Confidence Builder</h3>
+        </div>
+        <div class="booster-content">
+            <div class="confidence-tip">
+                <h4>💡 Today's Pro Tip:</h4>
+                <p id="dailyTip">Use market velocity data to demonstrate your expertise to clients.</p>
+            </div>
+            <div class="confidence-metrics">
+                <div class="confidence-metric">
+                    <div class="metric-label">Market Knowledge</div>
+                    <div class="metric-value">92%</div>
+                </div>
+                <div class="confidence-metric">
+                    <div class="metric-label">Client Trust</div>
+                    <div class="metric-value">88%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>© <span id="currentYear"></span> Real House Market Report (RHMR)</p>
-        <p style="margin-top: 0.5rem; font-size: 0.85rem;">
-            Data updates weekly • Last updated: <span id="lastUpdated"></span>
-        </p>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4><i class="fas fa-database"></i> Data Sources</h4>
+                <p>Zillow • Realtor.com • MLS • Public Records • Market Analysis</p>
+                <div class="data-status">
+                    <span class="status active"><i class="fas fa-circle"></i> All Systems Live</span>
+                    <span class="update-frequency">Updated every 10 minutes</span>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4><i class="fas fa-mobile-alt"></i> Mobile Ready</h4>
+                <p>Access your dashboard anywhere. Perfect for showings and client meetings.</p>
+                <div class="app-badges">
+                    <span class="badge"><i class="fas fa-qrcode"></i> Scan for Mobile</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© <span id="currentYear"></span> RHMR Pro - Real-Time Real Estate Intelligence</p>
+            <p>Designed to empower realtors with data-driven confidence</p>
+        </div>
     </footer>
 
-    <script src="charts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="realtime-dashboard.js"></script>
     <script>
-        // DOM Elements
-        const zipSelect = document.getElementById('zipSelect');
-        let allData = {};
-        const DASHBOARD_VERSION = "v2.0";
-        
-        // Initialize
-        document.getElementById('version').textContent = DASHBOARD_VERSION;
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-        document.getElementById('lastUpdated').textContent = new Date().toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-        });
-        
-        // Load JSON data
-        async function loadDataJSON() {
-            try {
-                const loadingOption = zipSelect.querySelector('option');
-                loadingOption.textContent = 'Loading data...';
-                
-                const response = await fetch('data/houston-county-ga/market_all_zips.json');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                allData = await response.json();
-                
-                // Clear and populate ZIP dropdown
-                zipSelect.innerHTML = '';
-                Object.keys(allData).forEach(zip => {
-                    const zipData = allData[zip];
-                    const option = document.createElement('option');
-                    option.value = zip;
-                    option.textContent = `${zip} - ${zipData.city || 'Unknown City'}`;
-                    zipSelect.appendChild(option);
-                });
-                
-                // Select first ZIP by default
-                if (zipSelect.options.length > 0) {
-                    zipSelect.value = zipSelect.options[0].value;
-                    loadZIP(zipSelect.value);
-                }
-                
-            } catch (err) {
-                console.error('Failed to load market data:', err);
-                zipSelect.innerHTML = '<option value="">Error loading data</option>';
-                
-                // Show error in metrics
-                document.querySelectorAll('.metric .value').forEach(el => {
-                    el.textContent = 'Error';
-                });
-                
-                document.getElementById('insightsList').innerHTML = `
-                    <div class="insight-card negative">
-                        <div class="insight-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <p class="insight-text">
-                            Failed to load market data. Please check the data file path and try again.
-                        </p>
-                    </div>
-                `;
-            }
-        }
-        
-        // Set arrow indicator
-        function setArrow(elementId, change) {
-            const el = document.getElementById(elementId);
-            el.innerHTML = '';
+        // Initialize real-time dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
             
-            if (change > 0) {
-                el.innerHTML = '<i class="fas fa-arrow-up arrow up"></i>';
-            } else if (change < 0) {
-                el.innerHTML = '<i class="fas fa-arrow-down arrow down"></i>';
-            } else {
-                el.innerHTML = '<i class="fas fa-minus arrow flat"></i>';
-            }
-        }
-        
-        // Load ZIP data
-        function loadZIP(zip) {
-            const data = allData[zip];
-            if (!data) return;
+            // Initialize real-time updates
+            initializeRealtimeDashboard();
             
-            // Update metrics with animations
-            const metrics = [
-                { id: 'medianList', value: data.pricing.median_list, change: data.history.median_list.slice(-1)[0] - data.history.median_list.slice(-2)[0] },
-                { id: 'medianSale', value: data.pricing.median_sale, change: data.history.median_sale ? data.history.median_sale.slice(-1)[0] - data.history.median_sale.slice(-2)[0] : 0 },
-                { id: 'inventory', value: data.inventory.active, change: data.history.inventory ? data.history.inventory.slice(-1)[0] - data.history.inventory.slice(-2)[0] : 0 }
-            ];
+            // Load initial data
+            loadDashboardData();
             
-            metrics.forEach(metric => {
-                const element = document.getElementById(metric.id);
-                element.textContent = metric.id.includes('Price') ? `$${metric.value.toLocaleString()}` : metric.value.toLocaleString();
-                setArrow(`${metric.id}Arrow`, metric.change);
-            });
-            
-            // Update trend
-            document.getElementById('trend').textContent = data.pricing.trend || 'Stable';
-            
-            // Update insights
-            const insightsDiv = document.getElementById('insightsList');
-            insightsDiv.innerHTML = '';
-            
-            if (data.weekly_insights && data.weekly_insights.length > 0) {
-                data.weekly_insights.forEach(insight => {
-                    const card = document.createElement('div');
-                    card.className = `insight-card ${insight.type || 'neutral'}`;
-                    
-                    let icon = 'info-circle';
-                    if (insight.type === 'positive') icon = 'check-circle';
-                    if (insight.type === 'negative') icon = 'exclamation-triangle';
-                    
-                    card.innerHTML = `
-                        <div class="insight-icon">
-                            <i class="fas fa-${icon}"></i>
-                        </div>
-                        <p class="insight-text">${insight.text || insight}</p>
-                    `;
-                    
-                    insightsDiv.appendChild(card);
-                });
-            } else {
-                insightsDiv.innerHTML = `
-                    <div class="insight-card neutral">
-                        <div class="insight-icon">
-                            <i class="fas fa-info-circle"></i>
-                        </div>
-                        <p class="insight-text">
-                            No insights available for this ZIP code. Check back next week.
-                        </p>
-                    </div>
-                `;
-            }
-            
-            // Render charts
-            setTimeout(() => {
-                renderLine(
-                    'priceChart',
-                    data.history.median_list,
-                    data.history.median_sale || null,
-                    'Price Trends ($)'
-                );
-                
-                renderLine(
-                    'inventoryChart',
-                    data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active),
-                    null,
-                    'Inventory Count'
-                );
-            }, 100);
-            
-            // Update page title with selected ZIP
-            document.title = `ZIP ${zip} | Houston County Real Estate Dashboard`;
-        }
-        
-        // Event listeners
-        zipSelect.addEventListener('change', () => {
-            const selectedZip = zipSelect.value;
-            if (selectedZip) {
-                loadZIP(selectedZip);
-            }
-        });
-        
-        // Initialize on load
-        window.addEventListener('load', loadDataJSON);
-        window.addEventListener('resize', () => {
-            // Re-render charts on resize for responsiveness
-            const selectedZip = zipSelect.value;
-            if (selectedZip && allData[selectedZip]) {
-                loadZIP(selectedZip);
-            }
+            // Start auto-refresh
+            startAutoRefresh();
         });
     </script>
 </body>
