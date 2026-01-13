@@ -6,6 +6,9 @@ function renderLine(canvasId, data) {
   const min = Math.min(...data);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
+  ctx.strokeStyle = "#1e3a8a";
+  ctx.lineWidth = 2;
 
   data.forEach((v, i) => {
     const x = i * (canvas.width / (data.length - 1));
