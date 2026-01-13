@@ -5,11 +5,12 @@ from datetime import date
 
 ZIP = "31088"
 
-RAW_DIR = Path(f"data/houston-county-ga/{ZIP}/raw")
+# TEMP location where fetch script wrote CSV
+CSV_FILE = Path("/tmp/houston_zhvi/zillow_zhvi.csv")
+
+# Output folder in repo
 OUT_DIR = Path(f"data/houston-county-ga/{ZIP}/processed")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-CSV_FILE = RAW_DIR / "zillow_zhvi.csv"
 
 # --- Load Zillow CSV ---
 rows = []
@@ -24,10 +25,9 @@ if not rows:
 
 row = rows[0]
 
-# --- Extract date columns dynamically ---
+# --- Extract last 4 months dynamically ---
 date_columns = [c for c in row.keys() if c[:4].isdigit()]
 date_columns.sort()
-
 last_periods = date_columns[-4:]
 values = [float(row[c]) for c in last_periods if row[c]]
 
@@ -81,7 +81,7 @@ market = {
     }
 }
 
-# --- Write output ---
+# --- Write output JSON to repo (small file)
 output_file = OUT_DIR / "market.json"
 with open(output_file, "w", encoding="utf-8") as f:
     json.dump(market, f, indent=2)
