@@ -10,10 +10,7 @@
     <h1>Houston County Real Estate Dashboard</h1>
     <div>
       <label for="zipSelect">Select ZIP:</label>
-      <select id="zipSelect">
-        <option value="31088" selected>31088 - Warner Robins</option>
-        <!-- Add more ZIPs here -->
-      </select>
+      <select id="zipSelect"></select>
     </div>
   </header>
 
@@ -48,13 +45,27 @@
 
     <section id="insights">
       <h2>Weekly Insights</h2>
-      <ul id="insightsList"></ul>
+      <div id="insightsList" class="insight-cards"></div>
     </section>
   </main>
 
   <script src="charts.js"></script>
   <script>
     const zipSelect = document.getElementById("zipSelect");
+
+    async function loadZIPs() {
+      // GitHub Pages paths are relative to dashboard folder
+      const response = await fetch('data/houston-county-ga/zips.json');
+      const zips = await response.json();
+      zipSelect.innerHTML = '';
+      zips.forEach(zip => {
+        const option = document.createElement('option');
+        option.value = zip;
+        option.innerText = zip;
+        zipSelect.appendChild(option);
+      });
+      loadData(zipSelect.value);
+    }
 
     function setArrow(elementId, change) {
       const el = document.getElementById(elementId);
@@ -64,37 +75,46 @@
     }
 
     async function loadData(zip) {
-      const response = await fetch(`../data/houston-county-ga/${zip}/processed/market.json`);
-      const data = await response.json();
+      try {
+        const response = await fetch(`data/houston-county-ga/${zip}/processed/market.json`);
+        const data = await response.json();
 
-      // Metrics
-      document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
-      setArrow("medianListArrow", data.pricing.median_list - data.history.median_list[data.history.median_list.length-2]);
+        // Metrics
+        const lastPriceChange = data.history.median_list[data.history.median_list.length-1] - data.history.median_list[data.history.median_list.length-2];
+        document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
+        setArrow("medianListArrow", lastPriceChange);
 
-      document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
-      setArrow("medianSaleArrow", data.pricing.median_sale - data.pricing.median_list);
+        document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
+        setArrow("medianSaleArrow", data.pricing.median_sale - data.pricing.median_list);
 
-      document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
-      setArrow("inventoryArrow", data.inventory.change_pct);
+        document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
+        setArrow("inventoryArrow", data.inventory.change_pct);
 
-      document.getElementById("trend").innerText = data.pricing.trend;
+        document.getElementById("trend").innerText = data.pricing.trend;
 
-      // Insights
-      const ul = document.getElementById("insightsList");
-      ul.innerHTML = "";
-      data.weekly_insights.forEach(point => {
-        const li = document.createElement("li");
-        li.innerText = point;
-        ul.appendChild(li);
-      });
+        // Insights
+        const insightsDiv = document.getElementById("insightsList");
+        insightsDiv.innerHTML = '';
+        data.weekly_insights.forEach(point => {
+          const card = document.createElement("div");
+          card.className = "insight-card";
+          card.innerText = point;
+          insightsDiv.appendChild(card);
+        });
 
-      // Charts
-      renderLine("priceChart", data.history.median_list, "Median List Price ($)");
-      renderLine("inventoryChart", data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active), "Inventory");
+        // Charts
+        renderLine("priceChart", data.history.median_list, "Median List Price ($)");
+        renderLine("inventoryChart", data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active), "Inventory");
+
+      } catch (err) {
+        console.error("Error loading data:", err);
+      }
     }
 
     zipSelect.addEventListener("change", () => loadData(zipSelect.value));
-    loadData(zipSelect.value);
+
+    // Initial load
+    loadZIPs();
   </script>
 </body>
 </html>
