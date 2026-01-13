@@ -9,6 +9,9 @@ function renderLine(canvasId, data, label) {
   const max = Math.max(...data);
   const min = Math.min(...data);
 
+  // Trend color
+  const trendColor = data[data.length-1] >= data[0] ? "green" : "red";
+
   // Draw axes
   ctx.strokeStyle = "#ccc";
   ctx.beginPath();
@@ -17,8 +20,8 @@ function renderLine(canvasId, data, label) {
   ctx.lineTo(canvas.width - padding, canvas.height - padding);
   ctx.stroke();
 
-  // Plot line
-  ctx.strokeStyle = "#1e3a8a";
+  // Draw trend line
+  ctx.strokeStyle = trendColor;
   ctx.lineWidth = 2;
   ctx.beginPath();
   data.forEach((v, i) => {
@@ -29,8 +32,8 @@ function renderLine(canvasId, data, label) {
   });
   ctx.stroke();
 
-  // Draw points + tooltips (simple labels)
-  ctx.fillStyle = "#1e3a8a";
+  // Points with labels
+  ctx.fillStyle = trendColor;
   ctx.font = "12px Arial";
   data.forEach((v, i) => {
     const x = padding + (i * width) / (data.length - 1);
