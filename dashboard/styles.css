@@ -66,12 +66,22 @@ canvas {
   margin-bottom: 2rem;
 }
 
-#insights ul {
-  list-style-type: disc;
-  margin-left: 2rem;
-  padding: 0;
+.insight-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-#insights li {
-  padding: 0.5rem 0;
+.insight-card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 10px;
+  flex: 1 1 250px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.insight-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
