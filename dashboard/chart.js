@@ -29,20 +29,16 @@ function renderLine(canvasId, data, label) {
   });
   ctx.stroke();
 
-  // Draw points + tooltips
+  // Draw points + tooltips (simple labels)
   ctx.fillStyle = "#1e3a8a";
+  ctx.font = "12px Arial";
   data.forEach((v, i) => {
     const x = padding + (i * width) / (data.length - 1);
     const y = canvas.height - padding - ((v - min) / (max - min)) * height;
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
-
-    // Label
-    ctx.fillStyle = "#333";
-    ctx.font = "12px Arial";
     ctx.fillText(v.toLocaleString(), x - 15, y - 10);
-    ctx.fillStyle = "#1e3a8a";
   });
 
   // Chart title
