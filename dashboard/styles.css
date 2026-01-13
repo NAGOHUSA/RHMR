@@ -42,6 +42,16 @@ main {
   flex: 1 1 200px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
+  position: relative;
+}
+
+.metric span {
+  font-size: 1.2rem;
+  margin-left: 0.3rem;
+}
+
+.metric:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 section h2 {
@@ -49,7 +59,19 @@ section h2 {
   margin-bottom: 1rem;
 }
 
+canvas {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
 #insights ul {
   list-style-type: disc;
   margin-left: 2rem;
+  padding: 0;
+}
+
+#insights li {
+  padding: 0.5rem 0;
 }
