@@ -15,18 +15,9 @@ header {
   align-items: center;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-}
-
 header select {
   font-size: 1rem;
   padding: 0.3rem;
-}
-
-main {
-  padding: 1rem 2rem;
 }
 
 .metric-container {
@@ -42,22 +33,13 @@ main {
   flex: 1 1 200px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
-  position: relative;
 }
 
-.metric span {
-  font-size: 1.2rem;
-  margin-left: 0.3rem;
-}
+.arrow.up { color: green; }
+.arrow.down { color: red; }
+.arrow.flat { color: gray; }
 
-.metric:hover {
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-section h2 {
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
+section h2 { margin-top: 2rem; margin-bottom: 1rem; }
 
 canvas {
   background: #fff;
@@ -80,8 +62,10 @@ canvas {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transition: transform 0.2s;
 }
-
 .insight-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+.insight-card.positive { border-left: 5px solid green; }
+.insight-card.negative { border-left: 5px solid red; }
+.insight-card.neutral { border-left: 5px solid gray; }
