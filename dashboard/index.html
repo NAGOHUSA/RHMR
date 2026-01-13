@@ -1,1 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Market Intelligence Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
+<header>
+  <h1>Market Intelligence</h1>
+  <select id="zipSelector"></select>
+  <p id="marketSummary"></p>
+</header>
+
+<section class="grid">
+  <div class="card" id="inventoryCard"></div>
+  <div class="card" id="pricingCard"></div>
+  <div class="card" id="velocityCard"></div>
+</section>
+
+<section class="card">
+  <h2>Weekly Talking Points</h2>
+  <ul id="talkingPoints"></ul>
+</section>
+
+<script src="market.js"></script>
+</body>
+</html>
