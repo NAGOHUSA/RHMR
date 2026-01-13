@@ -52,18 +52,27 @@
   <script src="charts.js"></script>
   <script>
     const zipSelect = document.getElementById("zipSelect");
+    let allData = {};
 
-    async function loadZIPs() {
-      const response = await fetch('data/houston-county-ga/zips.json');
-      const zips = await response.json();
-      zipSelect.innerHTML = '';
-      zips.forEach(zip => {
-        const option = document.createElement('option');
-        option.value = zip;
-        option.innerText = zip;
-        zipSelect.appendChild(option);
-      });
-      loadData(zipSelect.value);
+    async function loadDataJSON() {
+      try {
+        const response = await fetch('data/houston-county-ga/market_all_zips.json');
+        allData = await response.json();
+
+        // Populate ZIP dropdown
+        zipSelect.innerHTML = '';
+        Object.keys(allData).forEach(zip => {
+          const option = document.createElement('option');
+          option.value = zip;
+          option.innerText = `${zip} - ${allData[zip].city}`;
+          zipSelect.appendChild(option);
+        });
+
+        loadZIP(zipSelect.value);
+
+      } catch (err) {
+        console.error("Failed to load market JSON:", err);
+      }
     }
 
     function setArrow(elementId, change) {
@@ -73,48 +82,31 @@
       else el.innerHTML = '<span class="arrow flat">➡️</span>';
     }
 
-    async function loadData(zip) {
-      try {
-        const response = await fetch(`data/houston-county-ga/${zip}/processed/market.json`);
-        const data = await response.json();
+    function loadZIP(zip) {
+      const data = allData[zip];
+      if (!data) return;
 
-        // Metrics
-        const lastPriceChange = data.history.median_list[data.history.median_list.length-1] - data.history.median_list[data.history.median_list.length-2];
-        document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
-        setArrow("medianListArrow", lastPriceChange);
+      // Metrics
+      const lastListChange = data.history.median_list.slice(-1)[0] - data.history.median_list.slice(-2)[0];
+      document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
+      setArrow("medianListArrow", lastListChange);
 
-        document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
-        setArrow("medianSaleArrow", data.pricing.median_sale - data.pricing.median_list);
+      const lastSaleChange = data.history.median_sale ? data.history.median_sale.slice(-1)[0] - data.history.median_sale.slice(-2)[0] : 0;
+      document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
+      setArrow("medianSaleArrow", lastSaleChange);
 
-        document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
-        setArrow("inventoryArrow", data.inventory.change_pct);
+      const lastInventoryChange = data.history.inventory ? data.history.inventory.slice(-1)[0] - data.history.inventory.slice(-2)[0] : 0;
+      document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
+      setArrow("inventoryArrow", lastInventoryChange);
 
-        document.getElementById("trend").innerText = data.pricing.trend;
+      document.getElementById("trend").innerText = data.pricing.trend;
 
-        // Insights cards
-        const insightsDiv = document.getElementById("insightsList");
-        insightsDiv.innerHTML = '';
-        data.weekly_insights.forEach(point => {
-          const card = document.createElement("div");
-          card.className = "insight-card";
-          card.innerText = point.text;
-          if(point.type === 'positive') card.classList.add('positive');
-          else if(point.type === 'negative') card.classList.add('negative');
-          else card.classList.add('neutral');
-          insightsDiv.appendChild(card);
-        });
-
-        // Charts with trend coloring
-        renderLine("priceChart", data.history.median_list, "Median List Price ($)");
-        renderLine("inventoryChart", data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active), "Inventory");
-
-      } catch (err) {
-        console.error("Error loading data:", err);
-      }
-    }
-
-    zipSelect.addEventListener("change", () => loadData(zipSelect.value));
-    loadZIPs();
-  </script>
-</body>
-</html>
+      // Insights
+      const insightsDiv = document.getElementById("insightsList");
+      insightsDiv.innerHTML = '';
+      data.weekly_insights.forEach(point => {
+        const card = document.createElement("div");
+        card.className = "insight-card";
+        card.innerText = point.text;
+        if(point.type === 'positive') card.classList.add('positive');
+        else if(point.type === 'negative') card.
