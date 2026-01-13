@@ -23,15 +23,15 @@
       <div class="metric-container">
         <div class="metric">
           <h3>Median List Price</h3>
-          <p id="medianList">$0</p>
+          <p id="medianList">$0 <span id="medianListArrow"></span></p>
         </div>
         <div class="metric">
           <h3>Median Sale Price</h3>
-          <p id="medianSale">$0</p>
+          <p id="medianSale">$0 <span id="medianSaleArrow"></span></p>
         </div>
         <div class="metric">
           <h3>Inventory</h3>
-          <p id="inventory">0</p>
+          <p id="inventory">0 <span id="inventoryArrow"></span></p>
         </div>
         <div class="metric">
           <h3>Trend</h3>
@@ -42,8 +42,8 @@
 
     <section id="charts">
       <h2>Trends</h2>
-      <canvas id="priceChart" width="600" height="200"></canvas>
-      <canvas id="inventoryChart" width="600" height="200"></canvas>
+      <canvas id="priceChart" width="600" height="250"></canvas>
+      <canvas id="inventoryChart" width="600" height="250"></canvas>
     </section>
 
     <section id="insights">
@@ -56,14 +56,27 @@
   <script>
     const zipSelect = document.getElementById("zipSelect");
 
+    function setArrow(elementId, change) {
+      const el = document.getElementById(elementId);
+      if (change > 0) el.innerHTML = '⬆️';
+      else if (change < 0) el.innerHTML = '⬇️';
+      else el.innerHTML = '➡️';
+    }
+
     async function loadData(zip) {
       const response = await fetch(`../data/houston-county-ga/${zip}/processed/market.json`);
       const data = await response.json();
 
       // Metrics
       document.getElementById("medianList").innerText = `$${data.pricing.median_list.toLocaleString()}`;
+      setArrow("medianListArrow", data.pricing.median_list - data.history.median_list[data.history.median_list.length-2]);
+
       document.getElementById("medianSale").innerText = `$${data.pricing.median_sale.toLocaleString()}`;
+      setArrow("medianSaleArrow", data.pricing.median_sale - data.pricing.median_list);
+
       document.getElementById("inventory").innerText = data.inventory.active.toLocaleString();
+      setArrow("inventoryArrow", data.inventory.change_pct);
+
       document.getElementById("trend").innerText = data.pricing.trend;
 
       // Insights
@@ -76,15 +89,11 @@
       });
 
       // Charts
-      renderLine("priceChart", data.history.median_list);
-      renderLine("inventoryChart", data.history.inventory || [data.inventory.active, data.inventory.active, data.inventory.active]);
+      renderLine("priceChart", data.history.median_list, "Median List Price ($)");
+      renderLine("inventoryChart", data.history.inventory || Array(data.history.median_list.length).fill(data.inventory.active), "Inventory");
     }
 
-    zipSelect.addEventListener("change", () => {
-      loadData(zipSelect.value);
-    });
-
-    // Initial load
+    zipSelect.addEventListener("change", () => loadData(zipSelect.value));
     loadData(zipSelect.value);
   </script>
 </body>
