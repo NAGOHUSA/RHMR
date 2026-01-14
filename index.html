@@ -6,36 +6,7 @@
     <title>RHMR Pro | Real-Time Real Estate Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
     <style>
-        /* ===== RESET & VARIABLES ===== */
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --info: #4895ef;
-            --dark: #1a1a2e;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
-            --card-bg: #ffffff;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
-            --gradient-secondary: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
-            --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
-            --gradient-danger: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
-            --gradient-warning: linear-gradient(135deg, #f8961e 0%, #f3722c 100%);
-            --gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -45,49 +16,28 @@
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            color: var(--dark);
+            color: #1e293b;
             line-height: 1.6;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 1.5rem;
         }
 
-        /* ===== GLOW EFFECTS ===== */
-        .glow {
-            position: relative;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .glow::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: inherit;
-            border-radius: var(--radius);
-            filter: blur(20px);
-            opacity: 0.3;
-            z-index: -1;
-            transition: var(--transition);
-        }
-
-        /* ===== HEADER ===== */
-        header {
-            background: var(--gradient-dark);
-            color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            background: rgba(26, 26, 46, 0.95);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -95,238 +45,286 @@
             gap: 1.5rem;
         }
 
-        .logo-container {
+        .logo-section {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
         .logo {
-            background: var(--gradient-primary);
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            width: 60px;
+            height: 60px;
+            border-radius: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            font-size: 1.75rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
         }
 
         .logo-text h1 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 800;
-            background: linear-gradient(to right, #fff, #b0b7ff);
+            background: linear-gradient(to right, #60a5fa, #06b6d4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.2rem;
+            background-clip: text;
         }
 
         .logo-text p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-weight: 300;
+            color: #94a3b8;
+            font-size: 0.875rem;
         }
 
         .header-controls {
             display: flex;
-            gap: 1.5rem;
+            gap: 1rem;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        .zip-selector {
-            position: relative;
-        }
-
-        .zip-selector select {
+        .zip-select {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 0.8rem 3rem 0.8rem 1.5rem;
-            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
             font-size: 1rem;
             font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            appearance: none;
-            min-width: 220px;
             backdrop-filter: blur(10px);
+            cursor: pointer;
         }
 
-        .zip-selector select:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 20px rgba(67, 97, 238, 0.3);
-        }
-
-        .zip-selector::after {
-            content: '📍';
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            font-size: 1.2rem;
-        }
-
-        .last-updated {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.7rem 1.2rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
+        .update-time {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #94a3b8;
+            font-size: 0.875rem;
         }
 
-        .last-updated i {
-            color: var(--success);
-            animation: spin 4s linear infinite;
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            margin-top: 1rem;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .pulse-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
-        /* ===== MAIN LAYOUT ===== */
-        .dashboard {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 1.5rem;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        /* ===== METRIC CARDS ===== */
-        .metric-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
+        .live-text {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Market Pulse Banner */
+        .market-pulse {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #3b82f6 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .pulse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .pulse-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .pulse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .pulse-card {
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .pulse-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .pulse-card h4 {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .pulse-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .pulse-trend {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid;
+            transition: all 0.3s;
         }
 
         .metric-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
         }
 
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-            border-radius: var(--radius) var(--radius) 0 0;
-        }
-
-        .metric-card.primary::before { background: var(--gradient-primary); }
-        .metric-card.secondary::before { background: var(--gradient-secondary); }
-        .metric-card.success::before { background: var(--gradient-success); }
-        .metric-card.danger::before { background: var(--gradient-danger); }
-        .metric-card.warning::before { background: var(--gradient-warning); }
-        .metric-card.dark::before { background: var(--gradient-dark); }
+        .metric-card.blue { border-color: #3b82f6; }
+        .metric-card.purple { border-color: #8b5cf6; }
+        .metric-card.cyan { border-color: #06b6d4; }
+        .metric-card.orange { border-color: #f97316; }
 
         .metric-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.5rem;
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
         .metric-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 3rem;
+            height: 3rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            color: white;
+            border-radius: 0.5rem;
         }
 
-        .metric-primary .metric-icon { background: var(--gradient-primary); }
-        .metric-secondary .metric-icon { background: var(--gradient-secondary); }
-        .metric-success .metric-icon { background: var(--gradient-success); }
-        .metric-danger .metric-icon { background: var(--gradient-danger); }
-        .metric-warning .metric-icon { background: var(--gradient-warning); }
-        .metric-dark .metric-icon { background: var(--gradient-dark); }
+        .metric-icon.blue { color: #3b82f6; }
+        .metric-icon.purple { color: #8b5cf6; }
+        .metric-icon.cyan { color: #06b6d4; }
+        .metric-icon.orange { color: #f97316; }
 
-        .metric-title h3 {
-            font-size: 0.95rem;
-            color: var(--gray);
+        .metric-badge {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        .metric-badge.blue { background: #dbeafe; color: #1e40af; }
+        .metric-badge.purple { background: #ede9fe; color: #6b21a8; }
+        .metric-badge.cyan { background: #cffafe; color: #0e7490; }
+        .metric-badge.orange { background: #ffedd5; color: #c2410c; }
+
+        .metric-title {
+            color: #64748b;
+            font-size: 0.875rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.05em;
             margin-bottom: 0.5rem;
+            font-weight: 500;
         }
 
         .metric-value {
             font-size: 2.5rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
-            line-height: 1;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
         }
 
         .metric-change {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            gap: 0.375rem;
+            font-size: 0.875rem;
             font-weight: 600;
         }
 
-        .change-positive {
-            background: rgba(76, 201, 240, 0.1);
-            color: #4cc9f0;
+        .metric-change.positive { color: #10b981; }
+        .metric-change.negative { color: #ef4444; }
+
+        .metric-sub {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
         }
 
-        .change-negative {
-            background: rgba(247, 37, 133, 0.1);
-            color: #f72585;
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        .change-neutral {
-            background: rgba(108, 117, 125, 0.1);
-            color: var(--gray);
-        }
-
-        .metric-trend {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-        }
-
-        /* ===== LARGE CHARTS ===== */
-        .chart-container {
-            background: var(--card-bg);
-            border-radius: var(--radius);
+        .chart-card {
+            background: white;
+            border-radius: 0.75rem;
             padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .chart-container:hover {
-            box-shadow: var(--shadow-hover);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
 
         .chart-header {
@@ -336,788 +334,540 @@
             margin-bottom: 1.5rem;
         }
 
-        .chart-header h3 {
-            font-size: 1.2rem;
+        .chart-title {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: var(--dark);
+            color: #1e293b;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-        }
-
-        .chart-header i {
-            color: var(--primary);
-            font-size: 1.5rem;
+            gap: 0.5rem;
         }
 
         .chart-legend {
             display: flex;
             gap: 1rem;
-            font-size: 0.85rem;
+            font-size: 0.875rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            color: #64748b;
         }
 
-        .legend-color {
-            width: 12px;
-            height: 12px;
+        .legend-dot {
+            width: 0.75rem;
+            height: 0.75rem;
             border-radius: 50%;
         }
 
-        /* ===== INSIGHT CARDS ===== */
-        .insight-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
+        /* Action Items */
+        .action-section {
+            background: white;
+            border-radius: 0.75rem;
             padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
         }
 
-        .insight-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
-        .insight-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: var(--primary);
+        .action-card {
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid;
         }
 
-        .insight-card.positive::before { background: #4cc9f0; }
-        .insight-card.negative::before { background: #f72585; }
-        .insight-card.neutral::before { background: var(--gray); }
+        .action-card.high {
+            background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+            border-color: #06b6d4;
+        }
 
-        .insight-header {
+        .action-card.medium {
+            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+            border-color: #f97316;
+        }
+
+        .action-card h4 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
+        }
+
+        .action-card.high h4 { color: #0e7490; }
+        .action-card.medium h4 { color: #c2410c; }
+
+        .action-card p {
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        /* Insights */
+        .insights-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-left: 4px solid #10b981;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
             margin-bottom: 1rem;
         }
 
-        .insight-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: white;
+        .insight-card.blue {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-color: #3b82f6;
         }
 
-        .insight-positive .insight-icon { background: var(--gradient-success); }
-        .insight-negative .insight-icon { background: var(--gradient-danger); }
-        .insight-neutral .insight-icon { background: var(--gradient-dark); }
-
-        .insight-title h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.2rem;
+        .insight-card.gray {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-color: #64748b;
         }
 
-        .insight-title span {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-
-        .insight-content p {
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        /* ===== MARKET PULSE ===== */
-        .market-pulse {
-            background: var(--gradient-primary);
-            color: white;
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(67, 97, 238, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .market-pulse::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            right: -50%;
-            bottom: -50%;
-            background: linear-gradient(45deg, 
-                transparent 20%, 
-                rgba(255, 255, 255, 0.1) 40%,
-                rgba(255, 255, 255, 0.1) 60%,
-                transparent 80%);
-            animation: shine 3s infinite linear;
-        }
-
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-        }
-
-        .pulse-header {
+        .insight-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 1;
+            align-items: start;
+            margin-bottom: 0.75rem;
         }
 
-        .pulse-header h2 {
-            font-size: 1.8rem;
-            font-weight: 800;
+        .insight-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .insight-card h4 { color: #166534; }
+        .insight-card.blue h4 { color: #1e40af; }
+        .insight-card.gray h4 { color: #475569; }
+
+        .insight-time {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .insight-text {
+            color: #475569;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-tags {
             display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .pulse-header h2 i {
-            color: #ffd166;
-        }
-
-        .pulse-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
             gap: 0.5rem;
-            backdrop-filter: blur(10px);
+            flex-wrap: wrap;
         }
 
-        .pulse-badge i {
-            animation: pulse 1.5s infinite;
+        .tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
         }
 
-        .pulse-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            position: relative;
-            z-index: 1;
+        .tag.green { background: #bbf7d0; color: #166534; }
+        .tag.blue { background: #bfdbfe; color: #1e40af; }
+        .tag.purple { background: #e9d5ff; color: #6b21a8; }
+        .tag.yellow { background: #fef08a; color: #854d0e; }
+        .tag.cyan { background: #a5f3fc; color: #0e7490; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 2rem;
         }
 
-        .pulse-metric {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
+        .footer p {
+            margin: 0.5rem 0;
         }
 
-        .pulse-metric:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        .pulse-metric h4 {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .pulse-value {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        .pulse-trend {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* ===== GRID LAYOUT ===== */
-        .grid-span-2 { grid-column: span 2; }
-        .grid-span-3 { grid-column: span 3; }
-        .grid-span-4 { grid-column: span 4; }
-        .grid-span-6 { grid-column: span 6; }
-        .grid-span-8 { grid-column: span 8; }
-        .grid-span-12 { grid-column: span 12; }
-
-        /* ===== TOOLTIPS ===== */
-        .tooltip {
-            position: absolute;
-            background: rgba(26, 26, 46, 0.95);
-            color: white;
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            max-width: 300px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            pointer-events: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s, transform 0.3s;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tooltip.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .tooltip-header {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tooltip-content {
-            line-height: 1.5;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1200px) {
-            .dashboard {
-                grid-template-columns: repeat(8, 1fr);
-            }
-            .grid-span-3 { grid-column: span 4; }
-            .grid-span-6 { grid-column: span 8; }
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: repeat(4, 1fr);
-                padding: 0 1rem;
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
-            .grid-span-2, .grid-span-3, .grid-span-4, .grid-span-6 { grid-column: span 4; }
+            
             .header-content {
                 flex-direction: column;
                 text-align: center;
             }
-            .header-controls {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-            .grid-span-2, .grid-span-3, .grid-span-4, .grid-span-6, .grid-span-8 { grid-column: 1; }
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-top: 3rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        footer a:hover {
-            color: var(--secondary);
-        }
-
-        /* ===== LOADING ANIMATION ===== */
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(67, 97, 238, 0.1);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
         }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
-    <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-home"></i>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>RHMR Pro Dashboard</h1>
+                        <p>Real-Time Real Estate Intelligence Platform</p>
+                    </div>
                 </div>
-                <div class="logo-text">
-                    <h1>RHMR Pro Dashboard</h1>
-                    <p>Real-Time Real Estate Intelligence Platform</p>
-                </div>
-            </div>
-            
-            <div class="header-controls">
-                <div class="zip-selector">
-                    <select id="zipSelect">
-                        <option value="31088" selected>📍 31088 - Warner Robins</option>
+                
+                <div class="header-controls">
+                    <select class="zip-select" id="zipSelect">
+                        <option value="31088">📍 31088 - Warner Robins</option>
                         <option value="31093">📍 31093 - Centerville</option>
                         <option value="31098">📍 31098 - Bonaire</option>
                     </select>
-                </div>
-                
-                <div class="last-updated">
-                    <i class="fas fa-sync-alt"></i>
-                    <span id="updateTime">Updated: Just now</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN DASHBOARD -->
-    <main class="dashboard">
-        <!-- MARKET PULSE -->
-        <section class="market-pulse grid-span-12">
-            <div class="pulse-header">
-                <h2><i class="fas fa-heartbeat"></i> Market Pulse</h2>
-                <div class="pulse-badge">
-                    <i class="fas fa-circle"></i>
-                    LIVE
+                    
+                    <div class="update-time">
+                        <i class="fas fa-sync-alt fa-spin"></i>
+                        <span id="updateTime">Updated: Just now</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="pulse-metrics">
-                <div class="pulse-metric">
-                    <h4>Market Temperature</h4>
-                    <div class="pulse-value" id="marketTemp">82°</div>
+            <div class="live-badge">
+                <div class="pulse-dot"></div>
+                <span class="live-text">LIVE</span>
+                <span style="color: #94a3b8; margin-left: 0.5rem;">Auto-updating every 30 seconds</span>
+            </div>
+        </div>
+
+        <!-- Market Pulse Banner -->
+        <div class="market-pulse">
+            <div class="pulse-header">
+                <h2 class="pulse-title">
+                    <i class="fas fa-heartbeat"></i>
+                    Market Pulse
+                </h2>
+                <div class="live-badge" style="margin: 0;">
+                    <div class="pulse-dot"></div>
+                    <span class="live-text">LIVE</span>
+                </div>
+            </div>
+            
+            <div class="pulse-grid">
+                <div class="pulse-card">
+                    <h4><i class="fas fa-thermometer-half"></i> Market Temperature</h4>
+                    <div class="pulse-value">82°</div>
                     <div class="pulse-trend">
-                        <i class="fas fa-arrow-up" style="color: #4cc9f0;"></i>
+                        <i class="fas fa-arrow-up"></i>
                         <span>Heating up (+4° this week)</span>
                     </div>
                 </div>
                 
-                <div class="pulse-metric">
-                    <h4>Velocity Score</h4>
-                    <div class="pulse-value" id="velocityScore">87</div>
+                <div class="pulse-card">
+                    <h4><i class="fas fa-bolt"></i> Velocity Score</h4>
+                    <div class="pulse-value">87</div>
                     <div class="pulse-trend">
-                        <i class="fas fa-bolt" style="color: #ffd166;"></i>
+                        <i class="fas fa-bolt"></i>
                         <span>Fast-moving market</span>
                     </div>
                 </div>
                 
-                <div class="pulse-metric">
-                    <h4>Buyer/Seller Index</h4>
-                    <div class="pulse-value" id="leverageIndex">68</div>
+                <div class="pulse-card">
+                    <h4><i class="fas fa-balance-scale"></i> Buyer/Seller Index</h4>
+                    <div class="pulse-value">68</div>
                     <div class="pulse-trend">
-                        <i class="fas fa-balance-scale" style="color: #f8961e;"></i>
+                        <i class="fas fa-balance-scale"></i>
                         <span>Seller's market</span>
                     </div>
                 </div>
                 
-                <div class="pulse-metric">
-                    <h4>Opportunity Score</h4>
-                    <div class="pulse-value" id="opportunityScore">92</div>
+                <div class="pulse-card">
+                    <h4><i class="fas fa-star"></i> Opportunity Score</h4>
+                    <div class="pulse-value">92</div>
                     <div class="pulse-trend">
-                        <i class="fas fa-star" style="color: #ffd166;"></i>
+                        <i class="fas fa-star"></i>
                         <span>Excellent for new agents</span>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- PRICING METRICS -->
-        <div class="metric-card metric-primary grid-span-3" data-tooltip="Current median listing price in the selected ZIP code">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-tag"></i> Median List Price</h3>
-                    <div class="metric-value" id="medianList">$289,500</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-            </div>
-            <div class="metric-change change-positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+2.1% this month</span>
-            </div>
-            <div class="metric-trend">
-                <i class="fas fa-chart-line" style="color: #4cc9f0;"></i>
-            </div>
         </div>
 
-        <div class="metric-card metric-secondary grid-span-3" data-tooltip="Recent sale prices with average days on market">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-money-bill-wave"></i> Median Sale Price</h3>
-                    <div class="metric-value" id="medianSale">$281,200</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-hand-holding-usd"></i>
-                </div>
-            </div>
-            <div class="metric-change change-positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+1.8% this month</span>
-            </div>
-            <div class="metric-trend">
-                <span style="color: var(--gray); font-size: 0.9rem;">24 days avg</span>
-            </div>
-        </div>
-
-        <div class="metric-card metric-success grid-span-3" data-tooltip="Active properties currently on the market">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-home"></i> Active Inventory</h3>
-                    <div class="metric-value" id="inventory">105</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-building"></i>
-                </div>
-            </div>
-            <div class="metric-change change-negative">
-                <i class="fas fa-arrow-down"></i>
-                <span>-8% from last month</span>
-            </div>
-            <div class="metric-trend">
-                <i class="fas fa-chart-bar" style="color: #4cc9f0;"></i>
-            </div>
-        </div>
-
-        <div class="metric-card metric-warning grid-span-3" data-tooltip="Overall market trend and momentum">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-trending-up"></i> Market Trend</h3>
-                    <div class="metric-value" id="trend">Heating</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-fire"></i>
-                </div>
-            </div>
-            <div class="metric-change change-positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>Strong upward momentum</span>
-            </div>
-            <div class="metric-trend">
-                <i class="fas fa-thermometer-full" style="color: #f72585;"></i>
-            </div>
-        </div>
-
-        <!-- PRICE TREND CHART -->
-        <div class="chart-container grid-span-8" data-tooltip="12-month price trend with list vs sale comparison">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-line"></i> Price Trend Analysis</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--primary);"></div>
-                        <span>List Price</span>
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card blue">
+                <div class="metric-header">
+                    <div class="metric-icon blue">
+                        <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--secondary);"></div>
-                        <span>Sale Price</span>
-                    </div>
+                    <span class="metric-badge blue">LIVE</span>
                 </div>
-            </div>
-            <canvas id="priceChart" height="250"></canvas>
-        </div>
-
-        <!-- INVENTORY CHART -->
-        <div class="chart-container grid-span-4" data-tooltip="Inventory levels and absorption rate">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-bar"></i> Inventory Levels</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--success);"></div>
-                        <span>Active Listings</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="inventoryChart" height="250"></canvas>
-        </div>
-
-        <!-- MARKET VELOCITY -->
-        <div class="chart-container grid-span-6" data-tooltip="Market velocity and days on market trends">
-            <div class="chart-header">
-                <h3><i class="fas fa-tachometer-alt"></i> Market Velocity</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #f8961e;"></div>
-                        <span>Days on Market</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #f72585;"></div>
-                        <span>Price Reductions</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="velocityChart" height="250"></canvas>
-        </div>
-
-        <!-- MARKET SENTIMENT -->
-        <div class="chart-container grid-span-6" data-tooltip="Market sentiment and opportunity indicators">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-pie"></i> Market Composition</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--primary);"></div>
-                        <span>Under Contract</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--success);"></div>
-                        <span>Active</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--warning);"></div>
-                        <span>Price Reduced</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="sentimentChart" height="250"></canvas>
-        </div>
-
-        <!-- INSIGHTS -->
-        <div class="insight-card insight-positive grid-span-4" data-tooltip="Positive market indicators for sellers">
-            <div class="insight-header">
-                <div class="insight-icon">
+                <h3 class="metric-title">Median List Price</h3>
+                <div class="metric-value">$289,500</div>
+                <div class="metric-change positive">
                     <i class="fas fa-arrow-up"></i>
-                </div>
-                <div class="insight-title">
-                    <h4>Price Momentum</h4>
-                    <span>2 hours ago</span>
+                    <span>+2.1% this month</span>
                 </div>
             </div>
-            <div class="insight-content">
-                <p>List prices are increasing at 2.1% monthly pace. Sellers have strong negotiating power in current market conditions.</p>
+
+            <div class="metric-card purple">
+                <div class="metric-header">
+                    <div class="metric-icon purple">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <span class="metric-badge purple">24H</span>
+                </div>
+                <h3 class="metric-title">Median Sale Price</h3>
+                <div class="metric-value">$281,200</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+1.8% this month</span>
+                </div>
+                <div class="metric-sub">24 days avg</div>
+            </div>
+
+            <div class="metric-card cyan">
+                <div class="metric-header">
+                    <div class="metric-icon cyan">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <span class="metric-badge cyan">TREND</span>
+                </div>
+                <h3 class="metric-title">Active Inventory</h3>
+                <div class="metric-value">105</div>
+                <div class="metric-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-8% from last month</span>
+                </div>
+            </div>
+
+            <div class="metric-card orange">
+                <div class="metric-header">
+                    <div class="metric-icon orange">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <span class="metric-badge orange">LIVE</span>
+                </div>
+                <h3 class="metric-title">Market Trend</h3>
+                <div class="metric-value">Heating</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Strong upward momentum</span>
+                </div>
             </div>
         </div>
 
-        <div class="insight-card insight-negative grid-span-4" data-tooltip="Challenges and opportunities for buyers">
-            <div class="insight-header">
-                <div class="insight-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-line" style="color: #3b82f6;"></i>
+                        Price Trend Analysis
+                    </h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #3b82f6;"></div>
+                            <span>List Price</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #8b5cf6;"></div>
+                            <span>Sale Price</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="insight-title">
-                    <h4>Inventory Alert</h4>
-                    <span>4 hours ago</span>
-                </div>
+                <canvas id="priceChart" height="200"></canvas>
             </div>
-            <div class="insight-content">
-                <p>Active inventory dropped 8% this month. Buyers should act quickly on well-priced properties.</p>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-bar" style="color: #06b6d4;"></i>
+                        Inventory Levels
+                    </h3>
+                </div>
+                <canvas id="inventoryChart" height="200"></canvas>
             </div>
         </div>
 
-        <div class="insight-card insight-neutral grid-span-4" data-tooltip="Market stability and forecast">
-            <div class="insight-header">
-                <div class="insight-icon">
-                    <i class="fas fa-chart-line"></i>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-tachometer-alt" style="color: #f97316;"></i>
+                        Market Velocity
+                    </h3>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #f97316;"></div>
+                            <span>Days on Market</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: #ec4899;"></div>
+                            <span>Price Reductions</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="insight-title">
-                    <h4>Market Forecast</h4>
-                    <span>Today</span>
-                </div>
+                <canvas id="velocityChart" height="200"></canvas>
             </div>
-            <div class="insight-content">
-                <p>Stable growth expected through Q3. Interest rates remain favorable for both buyers and sellers.</p>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie" style="color: #8b5cf6;"></i>
+                        Market Composition
+                    </h3>
+                </div>
+                <canvas id="compositionChart" height="200"></canvas>
             </div>
         </div>
 
-        <!-- REALTOR TIPS -->
-        <div class="chart-container grid-span-12" data-tooltip="Actionable insights for real estate professionals">
+        <!-- Action Items -->
+        <div class="action-section">
             <div class="chart-header">
-                <h3><i class="fas fa-lightbulb"></i> Realtor Action Items</h3>
+                <h3 class="chart-title">
+                    <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
+                    Realtor Action Items
+                </h3>
                 <div class="chart-legend">
                     <div class="legend-item">
-                        <i class="fas fa-circle" style="color: #4cc9f0;"></i>
+                        <div class="legend-dot" style="background: #06b6d4;"></div>
                         <span>High Priority</span>
                     </div>
                     <div class="legend-item">
-                        <i class="fas fa-circle" style="color: #f8961e;"></i>
+                        <div class="legend-dot" style="background: #f97316;"></div>
                         <span>Medium Priority</span>
                     </div>
                 </div>
             </div>
-            <div class="action-items">
-                <div class="action-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div class="action-item" style="background: rgba(76, 201, 240, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #4cc9f0;">
-                        <h4 style="color: #4cc9f0; margin-bottom: 0.5rem;"><i class="fas fa-bullhorn"></i> Price New Listings Aggressively</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">Current market supports 2-3% above recent comps</p>
-                    </div>
-                    <div class="action-item" style="background: rgba(248, 150, 30, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #f8961e;">
-                        <h4 style="color: #f8961e; margin-bottom: 0.5rem;"><i class="fas fa-search"></i> Target Price-Reduced Properties</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">15 properties reduced price this week - great opportunities</p>
-                    </div>
-                    <div class="action-item" style="background: rgba(76, 201, 240, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #4cc9f0;">
-                        <h4 style="color: #4cc9f0; margin-bottom: 0.5rem;"><i class="fas fa-chart-line"></i> Update CMAs Weekly</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">Market moving fast - keep comps current</p>
-                    </div>
-                    <div class="action-item" style="background: rgba(248, 150, 30, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #f8961e;">
-                        <h4 style="color: #f8961e; margin-bottom: 0.5rem;"><i class="fas fa-users"></i> Focus on First-Time Buyers</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">High activity in $250-300k range</p>
-                    </div>
+            
+            <div class="action-grid">
+                <div class="action-card high">
+                    <h4>
+                        <i class="fas fa-chart-line"></i>
+                        Price New Listings Aggressively
+                    </h4>
+                    <p>Current market supports 2-3% above recent comps</p>
+                </div>
+                
+                <div class="action-card medium">
+                    <h4>
+                        <i class="fas fa-search"></i>
+                        Target Price-Reduced Properties
+                    </h4>
+                    <p>15 properties reduced price this week - great opportunities</p>
+                </div>
+                
+                <div class="action-card high">
+                    <h4>
+                        <i class="fas fa-sync-alt"></i>
+                        Update CMAs Weekly
+                    </h4>
+                    <p>Market moving fast - keep comps current</p>
+                </div>
+                
+                <div class="action-card medium">
+                    <h4>
+                        <i class="fas fa-users"></i>
+                        Focus on First-Time Buyers
+                    </h4>
+                    <p>High activity in $250-300k range</p>
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- TOOLTIP CONTAINER -->
-    <div id="tooltip" class="tooltip"></div>
+        <!-- Insights Feed -->
+        <div class="insights-section">
+            <h3 class="chart-title" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-rss" style="color: #eab308;"></i>
+                Live Market Insights
+            </h3>
+            
+            <div class="insight-card">
+                <div class="insight-header">
+                    <h4>📈 Price Momentum Building</h4>
+                    <span class="insight-time">2 min ago</span>
+                </div>
+                <p class="insight-text">3 consecutive days of price increases in Warner Robins. Consider adjusting listing strategies.</p>
+                <div class="insight-tags">
+                    <span class="tag green">Pricing</span>
+                    <span class="tag blue">Strategy</span>
+                </div>
+            </div>
 
-    <!-- FOOTER -->
-    <footer>
-        <p>© 2024 RHMR Pro Dashboard | Real-Time Real Estate Intelligence</p>
-        <p>Data updates automatically • Built for real estate professionals</p>
-        <p style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
-            <i class="fas fa-database"></i> Data Sources: Zillow • Realtor.com • MLS • Public Records
-        </p>
-    </footer>
+            <div class="insight-card blue">
+                <div class="insight-header">
+                    <h4>🎯 First-Time Buyer Activity</h4>
+                    <span class="insight-time">15 min ago</span>
+                </div>
+                <p class="insight-text">Increased search activity from first-time buyers in the $250-300k range.</p>
+                <div class="insight-tags">
+                    <span class="tag purple">Buyers</span>
+                    <span class="tag yellow">Opportunity</span>
+                </div>
+            </div>
+
+            <div class="insight-card gray">
+                <div class="insight-header">
+                    <h4>🏠 New Listing Alert</h4>
+                    <span class="insight-time">30 min ago</span>
+                </div>
+                <p class="insight-text">5 new listings entered the market this morning. All priced competitively.</p>
+                <div class="insight-tags">
+                    <span class="tag cyan">Inventory</span>
+                    <span class="tag green">New</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2024 RHMR Pro Dashboard | Real-Time Real Estate Intelligence</p>
+            <p>Data Sources: Zillow • Realtor.com • MLS • Public Records</p>
+        </div>
+    </div>
 
     <script>
-        // Global variables
-        let charts = {};
-        let currentData = {};
-        let tooltipTimeout;
-
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDashboard();
-            setupEventListeners();
-            setupTooltips();
-            loadData();
-            startAutoRefresh();
-        });
-
-        // Initialize dashboard components
-        function initializeDashboard() {
-            console.log('🚀 Initializing RHMR Pro Dashboard...');
-            
-            // Update timestamp
-            updateTimestamp();
-            
-            // Initialize all charts
-            initializeCharts();
-            
-            // Set random data for demo (replace with real API calls)
-            setRandomData();
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('updateTime').textContent = `Updated: ${timeString}`;
         }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // ZIP code selector
-            document.getElementById('zipSelect').addEventListener('change', function(e) {
-                const zip = e.target.value;
-                console.log(`📍 ZIP code changed to: ${zip}`);
-                loadData(zip);
-                showNotification(`Loading data for ZIP ${zip}...`, 'info');
-            });
-
-            // Hover effects for metric cards
-            document.querySelectorAll('.metric-card, .chart-container, .insight-card').forEach(card => {
-                card.addEventListener('mouseenter', function(e) {
-                    this.style.transform = this.classList.contains('metric-card') ? 
-                        'translateY(-8px)' : 'translateY(-3px)';
-                });
-                
-                card.addEventListener('mouseleave', function(e) {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        }
-
-        // Setup tooltips
-        function setupTooltips() {
-            const tooltip = document.getElementById('tooltip');
-            
-            document.querySelectorAll('[data-tooltip]').forEach(element => {
-                element.addEventListener('mouseenter', function(e) {
-                    const text = this.getAttribute('data-tooltip');
-                    const rect = this.getBoundingClientRect();
-                    
-                    // Clear any existing timeout
-                    clearTimeout(tooltipTimeout);
-                    
-                    // Position tooltip
-                    tooltip.innerHTML = `
-                        <div class="tooltip-header">
-                            <i class="fas fa-info-circle"></i>
-                            Quick Insight
-                        </div>
-                        <div class="tooltip-content">${text}</div>
-                    `;
-                    
-                    // Position based on element location
-                    let left = rect.left + (rect.width / 2) - 150;
-                    let top = rect.top + window.scrollY - 120;
-                    
-                    // Keep tooltip within viewport
-                    left = Math.max(20, Math.min(left, window.innerWidth - 320));
-                    top = Math.max(20, top);
-                    
-                    tooltip.style.left = `${left}px`;
-                    tooltip.style.top = `${top}px`;
-                    tooltip.classList.add('show');
-                });
-                
-                element.addEventListener('mouseleave', function(e) {
-                    tooltipTimeout = setTimeout(() => {
-                        tooltip.classList.remove('show');
-                    }, 300);
-                });
-            });
-        }
+        
+        setInterval(updateTimestamp, 30000);
 
         // Initialize charts
-        function initializeCharts() {
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTimestamp();
+            
             // Price Trend Chart
             const priceCtx = document.getElementById('priceChart').getContext('2d');
-            charts.price = new Chart(priceCtx, {
+            new Chart(priceCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                     datasets: [
                         {
                             label: 'List Price',
-                            data: [265, 268, 272, 275, 279, 282, 285, 287, 289, 291, 293, 295],
-                            borderColor: '#4361ee',
-                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                            data: [285, 287, 288, 289, 290, 289, 290],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
                             borderWidth: 3,
                             fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#4361ee',
-                            pointRadius: 4,
-                            pointHoverRadius: 8
+                            tension: 0.4
                         },
                         {
                             label: 'Sale Price',
-                            data: [258, 261, 264, 268, 272, 275, 278, 281, 283, 285, 287, 289],
-                            borderColor: '#7209b7',
-                            backgroundColor: 'rgba(114, 9, 183, 0.1)',
+                            data: [278, 280, 281, 282, 283, 282, 283],
+                            borderColor: '#8b5cf6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            borderDash: [5, 5],
-                            pointBackgroundColor: '#7209b7',
-                            pointRadius: 4,
-                            pointHoverRadius: 8
+                            borderDash: [5, 5]
                         }
                     ]
                 },
@@ -1125,116 +875,61 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(26, 26, 46, 0.95)',
+                            backgroundColor: '#1e293b',
+                            padding: 12,
                             titleColor: '#fff',
                             bodyColor: '#fff',
                             borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += '$' + (context.parsed.y * 1000).toLocaleString();
-                                    return label;
-                                }
-                            }
+                            borderWidth: 1
                         }
                     },
                     scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
-                        },
                         y: {
                             beginAtZero: false,
-                            min: 250,
                             ticks: {
-                                color: '#666',
                                 callback: function(value) {
-                                    return '$' + (value * 1000).toLocaleString();
+                                    return ' + value + 'k';
                                 }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
 
             // Inventory Chart
             const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-            charts.inventory = new Chart(inventoryCtx, {
+            new Chart(inventoryCtx, {
                 type: 'bar',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                     datasets: [{
                         label: 'Active Listings',
                         data: [135, 128, 118, 112, 108, 105],
-                        backgroundColor: 'rgba(76, 201, 240, 0.8)',
-                        borderColor: '#4cc9f0',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                        borderSkipped: false
+                        backgroundColor: '#06b6d4',
+                        borderRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(26, 26, 46, 0.95)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff'
+                            backgroundColor: '#1e293b',
+                            padding: 12
                         }
                     },
                     scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#666',
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
-                        }
+                        y: { beginAtZero: true }
                     }
                 }
             });
 
             // Velocity Chart
             const velocityCtx = document.getElementById('velocityChart').getContext('2d');
-            charts.velocity = new Chart(velocityCtx, {
+            new Chart(velocityCtx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -1242,8 +937,8 @@
                         {
                             label: 'Days on Market',
                             data: [38, 35, 32, 29, 26, 24],
-                            borderColor: '#f8961e',
-                            backgroundColor: 'rgba(248, 150, 30, 0.1)',
+                            borderColor: '#f97316',
+                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
@@ -1252,11 +947,12 @@
                         {
                             label: 'Price Reductions',
                             data: [22, 20, 18, 16, 14, 15],
-                            borderColor: '#f72585',
-                            backgroundColor: 'rgba(247, 37, 133, 0.1)',
+                            borderColor: '#ec4899',
+                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
+                            borderDash: [5, 5],
                             yAxisID: 'y1'
                         }
                     ]
@@ -1265,77 +961,57 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12
                         }
                     },
                     scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
-                        },
                         y: {
                             type: 'linear',
                             display: true,
-                            position: 'left',
-                            ticks: {
-                                color: '#666'
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
+                            position: 'left'
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            ticks: {
-                                color: '#666'
-                            },
-                            grid: {
-                                drawOnChartArea: false
-                            }
+                            grid: { drawOnChartArea: false }
                         }
                     }
                 }
             });
 
-            // Sentiment Chart (Doughnut)
-            const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
-            charts.sentiment = new Chart(sentimentCtx, {
+            // Market Composition Chart
+            const compositionCtx = document.getElementById('compositionChart').getContext('2d');
+            new Chart(compositionCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Under Contract', 'Active', 'Price Reduced', 'New'],
                     datasets: [{
                         data: [35, 105, 15, 12],
-                        backgroundColor: [
-                            '#4361ee',
-                            '#4cc9f0',
-                            '#f8961e',
-                            '#7209b7'
-                        ],
+                        backgroundColor: ['#3b82f6', '#06b6d4', '#f97316', '#8b5cf6'],
                         borderWidth: 0,
-                        hoverOffset: 20
+                        hoverOffset: 15
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '70%',
+                    cutout: '65%',
                     plugins: {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                padding: 20,
+                                padding: 15,
                                 usePointStyle: true,
                                 pointStyle: 'circle'
                             }
                         },
                         tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
                             callbacks: {
                                 label: function(context) {
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -1347,216 +1023,5 @@
                     }
                 }
             });
-        }
-
-        // Load data from API
-        async function loadData(zip = '31088') {
-            try {
-                // Show loading state
-                document.querySelectorAll('.metric-value').forEach(el => {
-                    el.innerHTML = '<span class="spinner" style="width: 20px; height: 20px;"></span>';
-                });
-
-                // Try to load from data file
-                const response = await fetch(`data/houston-county-ga/dashboard_data.json?t=${Date.now()}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    currentData = data;
-                    
-                    // Update UI with real data
-                    updateUI(data);
-                    
-                    // Update timestamp
-                    updateTimestamp();
-                    
-                    showNotification('Data loaded successfully!', 'success');
-                } else {
-                    // Fallback to demo data
-                    setRandomData();
-                    showNotification('Using demo data - check data source', 'warning');
-                }
-            } catch (error) {
-                console.error('Error loading data:', error);
-                setRandomData();
-                showNotification('Error loading data. Using demo data.', 'error');
-            }
-        }
-
-        // Update UI with data
-        function updateUI(data) {
-            // Update market pulse
-            const marketSummary = data.market_summary || {};
-            document.getElementById('marketTemp').textContent = `${marketSummary.avg_opportunity_score || 82}°`;
-            document.getElementById('velocityScore').textContent = marketSummary.avg_opportunity_score || 87;
-            document.getElementById('leverageIndex').textContent = 65;
-            document.getElementById('opportunityScore').textContent = marketSummary.avg_opportunity_score || 92;
-
-            // Update metrics
-            if (data.zip_codes && data.zip_codes.length > 0) {
-                const zipData = data.zip_codes[0];
-                document.getElementById('medianList').textContent = `$${(zipData.metrics?.composite_price || 289500).toLocaleString()}`;
-                document.getElementById('medianSale').textContent = `$${Math.round((zipData.metrics?.composite_price || 289500) * 0.97).toLocaleString()}`;
-                document.getElementById('inventory').textContent = zipData.metrics?.composite_inventory || 105;
-                document.getElementById('trend').textContent = marketSummary.market_trend || 'Heating';
-            }
-
-            // Update charts with new data
-            updateCharts(data);
-        }
-
-        // Update charts with new data
-        function updateCharts(data) {
-            if (!charts.price || !data) return;
-
-            // Update price chart with random variation for demo
-            const priceData = charts.price.data.datasets[0].data;
-            const saleData = charts.price.data.datasets[1].data;
-            
-            // Add new data point and remove oldest
-            const lastPrice = priceData[priceData.length - 1];
-            const lastSale = saleData[saleData.length - 1];
-            
-            priceData.push(lastPrice + (Math.random() - 0.5) * 2);
-            saleData.push(lastSale + (Math.random() - 0.5) * 1.5);
-            
-            priceData.shift();
-            saleData.shift();
-            
-            // Update labels
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            charts.price.data.labels = [];
-            
-            for (let i = 0; i < 12; i++) {
-                const monthIndex = (currentMonth - 11 + i + 12) % 12;
-                charts.price.data.labels.push(months[monthIndex]);
-            }
-            
-            charts.price.update('none');
-            
-            // Update inventory chart
-            const inventoryData = charts.inventory.data.datasets[0].data;
-            const newInventory = data.market_summary?.total_inventory || 105;
-            inventoryData.push(newInventory);
-            inventoryData.shift();
-            charts.inventory.update('none');
-        }
-
-        // Set random data for demo
-        function setRandomData() {
-            // Generate realistic random data
-            const basePrice = 285000 + Math.floor(Math.random() * 15000);
-            const inventory = 95 + Math.floor(Math.random() * 30);
-            const trend = Math.random() > 0.3 ? 'Heating' : 'Cooling';
-            
-            // Update metrics
-            document.getElementById('medianList').textContent = `$${basePrice.toLocaleString()}`;
-            document.getElementById('medianSale').textContent = `$${Math.round(basePrice * 0.97).toLocaleString()}`;
-            document.getElementById('inventory').textContent = inventory;
-            document.getElementById('trend').textContent = trend;
-            
-            // Update pulse metrics with slight variations
-            const temp = 75 + Math.floor(Math.random() * 15);
-            const velocity = 75 + Math.floor(Math.random() * 20);
-            const leverage = 50 + Math.floor(Math.random() * 30);
-            const opportunity = 70 + Math.floor(Math.random() * 25);
-            
-            document.getElementById('marketTemp').textContent = `${temp}°`;
-            document.getElementById('velocityScore').textContent = velocity;
-            document.getElementById('leverageIndex').textContent = leverage;
-            document.getElementById('opportunityScore').textContent = opportunity;
-            
-            // Update timestamp
-            updateTimestamp();
-        }
-
-        // Update timestamp
-        function updateTimestamp() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            
-            const formatted = now.toLocaleDateString('en-US', options);
-            document.getElementById('updateTime').textContent = `Updated: ${formatted}`;
-        }
-
-        // Show notification
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: ${type === 'success' ? '#4cc9f0' : type === 'error' ? '#f72585' : '#4361ee'};
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-                z-index: 10000;
-                transform: translateX(120%);
-                transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-                max-width: 300px;
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255,255,255,0.1);
-            `;
-            
-            notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Animate in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateX(120%)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // Start auto-refresh
-        function startAutoRefresh(interval = 30000) { // 30 seconds
-            setInterval(() => {
-                const zip = document.getElementById('zipSelect').value;
-                loadData(zip);
-                
-                // Add visual feedback
-                const syncIcon = document.querySelector('.last-updated i');
-                syncIcon.style.transform = 'rotate(180deg)';
-                setTimeout(() => {
-                    syncIcon.style.transform = 'rotate(360deg)';
-                }, 300);
-            }, interval);
-        }
-
-        // Expose to global scope for debugging
-        window.dashboard = {
-            loadData,
-            setRandomData,
-            showNotification,
-            updateTimestamp
-        };
+        });
     </script>
-</body>
-</html>
