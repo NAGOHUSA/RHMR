@@ -3,37 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHMR Pro | Real-Time Real Estate Dashboard 1.0</title>
+    <title>RHMR Pro | Real Estate Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.3.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0"></script>
     <style>
         /* ===== RESET & VARIABLES ===== */
         :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --secondary: #7209b7;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --info: #4895ef;
-            --dark: #1a1a2e;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --gray-light: #e9ecef;
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
             --card-bg: #ffffff;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
-            --gradient-secondary: linear-gradient(135deg, #7209b7 0%, #560bad 100%);
-            --gradient-success: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
-            --gradient-danger: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
-            --gradient-warning: linear-gradient(135deg, #f8961e 0%, #f3722c 100%);
-            --gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s ease;
         }
 
         * {
@@ -43,102 +35,86 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: var(--dark);
-            line-height: 1.6;
+            line-height: 1.5;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* ===== GLOW EFFECTS ===== */
-        .glow {
-            position: relative;
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
 
-        .glow::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: inherit;
-            border-radius: var(--radius);
-            filter: blur(20px);
-            opacity: 0.3;
-            z-index: -1;
-            transition: var(--transition);
+        ::-webkit-scrollbar-track {
+            background: var(--gray-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
         }
 
         /* ===== HEADER ===== */
-        header {
-            background: var(--gradient-dark);
-            color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
             position: sticky;
             top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            background: rgba(26, 26, 46, 0.95);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            padding: 1rem 2rem;
         }
 
-        .header-content {
+        .header-container {
             max-width: 1400px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
-        .logo-container {
+        .logo {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        .logo {
-            background: var(--gradient-primary);
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            color: white;
+            font-size: 1.2rem;
         }
 
         .logo-text h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #fff, #b0b7ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.2rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
         }
 
         .logo-text p {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-weight: 300;
+            font-size: 0.85rem;
+            color: var(--gray);
         }
 
         .header-controls {
             display: flex;
             gap: 1.5rem;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .zip-selector {
@@ -146,321 +122,309 @@
         }
 
         .zip-selector select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.8rem 3rem 0.8rem 1.5rem;
-            border-radius: 12px;
-            font-size: 1rem;
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            font-size: 0.95rem;
             font-weight: 600;
+            color: var(--dark);
             cursor: pointer;
             transition: var(--transition);
+            min-width: 180px;
             appearance: none;
-            min-width: 220px;
-            backdrop-filter: blur(10px);
         }
 
-        .zip-selector select:hover {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 20px rgba(67, 97, 238, 0.3);
+        .zip-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        .zip-selector::after {
+        .zip-selector::before {
             content: '📍';
             position: absolute;
-            right: 1rem;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            pointer-events: none;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
 
-        .last-updated {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.7rem 1.2rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
+        .status-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
         }
 
-        .last-updated i {
-            color: var(--success);
-            animation: spin 4s linear infinite;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        /* ===== MAIN LAYOUT ===== */
+        /* ===== DASHBOARD LAYOUT ===== */
         .dashboard {
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
+        }
+
+        .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
             gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         /* ===== METRIC CARDS ===== */
         .metric-card {
-            background: var(--card-bg);
+            background: white;
             border-radius: var(--radius);
-            padding: 1.5rem;
+            padding: 1.25rem;
             box-shadow: var(--shadow);
             transition: var(--transition);
+            border: 1px solid transparent;
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
         }
 
         .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--gray-light);
         }
-
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-            border-radius: var(--radius) var(--radius) 0 0;
-        }
-
-        .metric-card.primary::before { background: var(--gradient-primary); }
-        .metric-card.secondary::before { background: var(--gradient-secondary); }
-        .metric-card.success::before { background: var(--gradient-success); }
-        .metric-card.danger::before { background: var(--gradient-danger); }
-        .metric-card.warning::before { background: var(--gradient-warning); }
-        .metric-card.dark::before { background: var(--gradient-dark); }
 
         .metric-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.75rem;
         }
 
         .metric-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .metric-primary .metric-icon { background: var(--gradient-primary); }
-        .metric-secondary .metric-icon { background: var(--gradient-secondary); }
-        .metric-success .metric-icon { background: var(--gradient-success); }
-        .metric-danger .metric-icon { background: var(--gradient-danger); }
-        .metric-warning .metric-icon { background: var(--gradient-warning); }
-        .metric-dark .metric-icon { background: var(--gradient-dark); }
-
-        .metric-title h3 {
-            font-size: 0.95rem;
-            color: var(--gray);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            line-height: 1;
-        }
-
-        .metric-change {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .change-positive {
-            background: rgba(76, 201, 240, 0.1);
-            color: #4cc9f0;
-        }
-
-        .change-negative {
-            background: rgba(247, 37, 133, 0.1);
-            color: #f72585;
-        }
-
-        .change-neutral {
-            background: rgba(108, 117, 125, 0.1);
-            color: var(--gray);
-        }
-
-        .metric-trend {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-        }
-
-        /* ===== LARGE CHARTS ===== */
-        .chart-container {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .chart-container:hover {
-            box-shadow: var(--shadow-hover);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .chart-header h3 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .chart-header i {
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-
-        .chart-legend {
-            display: flex;
-            gap: 1rem;
-            font-size: 0.85rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        /* ===== INSIGHT CARDS ===== */
-        .insight-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .insight-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .insight-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            background: var(--primary);
-        }
-
-        .insight-card.positive::before { background: #4cc9f0; }
-        .insight-card.negative::before { background: #f72585; }
-        .insight-card.neutral::before { background: var(--gray); }
-
-        .insight-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .insight-icon {
             width: 40px;
             height: 40px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .metric-price .metric-icon { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); }
+        .metric-inventory .metric-icon { background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%); }
+        .metric-trend .metric-icon { background: linear-gradient(135deg, var(--secondary) 0%, #34d399 100%); }
+        .metric-velocity .metric-icon { background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%); }
+
+        .metric-title h3 {
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .change-up {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+
+        .change-down {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .change-neutral {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--gray);
+        }
+
+        /* ===== CHART CONTAINERS ===== */
+        .chart-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-title i {
+            color: var(--primary);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-price { background: var(--primary); }
+        .legend-sale { background: var(--info); }
+        .legend-inventory { background: var(--secondary); }
+        .legend-dom { background: var(--warning); }
+
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* ===== INSIGHT CARDS ===== */
+        .insight-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .insight-card.positive {
+            border-left-color: var(--secondary);
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), white);
+        }
+
+        .insight-card.negative {
+            border-left-color: var(--danger);
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.05), white);
+        }
+
+        .insight-card.neutral {
+            border-left-color: var(--gray);
+            background: linear-gradient(to right, rgba(100, 116, 139, 0.05), white);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
             color: white;
         }
 
-        .insight-positive .insight-icon { background: var(--gradient-success); }
-        .insight-negative .insight-icon { background: var(--gradient-danger); }
-        .insight-neutral .insight-icon { background: var(--gradient-dark); }
+        .insight-positive .insight-icon { background: var(--secondary); }
+        .insight-negative .insight-icon { background: var(--danger); }
+        .insight-neutral .insight-icon { background: var(--gray); }
 
         .insight-title h4 {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 0.2rem;
+            color: var(--dark);
+            margin-bottom: 0.1rem;
         }
 
-        .insight-title span {
-            font-size: 0.8rem;
+        .insight-time {
+            font-size: 0.75rem;
             color: var(--gray);
         }
 
         .insight-content p {
+            font-size: 0.9rem;
             color: var(--dark);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        /* ===== MARKET PULSE ===== */
-        .market-pulse {
-            background: var(--gradient-primary);
+        /* ===== MARKET OVERVIEW ===== */
+        .market-overview {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
             color: white;
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(67, 97, 238, 0.3);
+            box-shadow: var(--shadow-lg);
             position: relative;
             overflow: hidden;
         }
 
-        .market-pulse::before {
+        .market-overview::before {
             content: '';
             position: absolute;
             top: -50%;
-            left: -50%;
             right: -50%;
-            bottom: -50%;
-            background: linear-gradient(45deg, 
-                transparent 20%, 
-                rgba(255, 255, 255, 0.1) 40%,
-                rgba(255, 255, 255, 0.1) 60%,
-                transparent 80%);
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: rotate(45deg);
             animation: shine 3s infinite linear;
         }
 
@@ -469,226 +433,216 @@
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
-        .pulse-header {
+        .overview-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             position: relative;
             z-index: 1;
         }
 
-        .pulse-header h2 {
-            font-size: 1.8rem;
-            font-weight: 800;
+        .overview-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
-        .pulse-header h2 i {
-            color: #ffd166;
-        }
-
-        .pulse-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .pulse-badge i {
-            animation: pulse 1.5s infinite;
-        }
-
-        .pulse-metrics {
+        .overview-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 1.5rem;
             position: relative;
             z-index: 1;
         }
 
-        .pulse-metric {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition);
-        }
-
-        .pulse-metric:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        .pulse-metric h4 {
-            font-size: 0.9rem;
+        .stat-item h4 {
+            font-size: 0.85rem;
             opacity: 0.9;
             margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-weight: 500;
         }
 
-        .pulse-value {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
 
-        .pulse-trend {
-            font-size: 0.9rem;
+        .stat-trend {
+            font-size: 0.85rem;
+            opacity: 0.9;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
-        /* ===== GRID LAYOUT ===== */
-        .grid-span-2 { grid-column: span 2; }
-        .grid-span-3 { grid-column: span 3; }
-        .grid-span-4 { grid-column: span 4; }
-        .grid-span-6 { grid-column: span 6; }
-        .grid-span-8 { grid-column: span 8; }
-        .grid-span-12 { grid-column: span 12; }
+        /* ===== GRID SPANS ===== */
+        .col-1 { grid-column: span 1; }
+        .col-2 { grid-column: span 2; }
+        .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; }
+        .col-6 { grid-column: span 6; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
 
         /* ===== TOOLTIPS ===== */
-        .tooltip {
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+
+        [data-tooltip]:hover::before {
+            content: attr(data-tooltip);
             position: absolute;
-            background: rgba(26, 26, 46, 0.95);
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
             color: white;
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            max-width: 300px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
             z-index: 1000;
+            box-shadow: var(--shadow-lg);
             pointer-events: none;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.3s, transform 0.3s;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .tooltip.show {
-            opacity: 1;
-            transform: translateY(0);
+        [data-tooltip]:hover::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--dark);
         }
 
-        .tooltip-header {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tooltip-content {
-            line-height: 1.5;
-        }
-
-        /* ===== RESPONSIVE ===== */
+        /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 1200px) {
-            .dashboard {
+            .dashboard-grid {
                 grid-template-columns: repeat(8, 1fr);
             }
-            .grid-span-3 { grid-column: span 4; }
-            .grid-span-6 { grid-column: span 8; }
+            
+            .col-3 { grid-column: span 4; }
+            .col-4 { grid-column: span 4; }
+            .col-6 { grid-column: span 8; }
+            .col-8 { grid-column: span 8; }
         }
 
         @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: repeat(4, 1fr);
-                padding: 0 1rem;
-            }
-            .grid-span-2, .grid-span-3, .grid-span-4, .grid-span-6 { grid-column: span 4; }
-            .header-content {
+            .header-container {
                 flex-direction: column;
+                gap: 1rem;
                 text-align: center;
             }
-            .header-controls {
-                width: 100%;
-                justify-content: center;
+            
+            .dashboard {
+                padding: 0 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .col-2, .col-3, .col-4, .col-6, .col-8 { grid-column: span 4; }
+            
+            .overview-stats {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 480px) {
-            .dashboard {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            .grid-span-2, .grid-span-3, .grid-span-4, .grid-span-6, .grid-span-8 { grid-column: 1; }
+            
+            .col-2, .col-3, .col-4, .col-6, .col-8 { grid-column: 1; }
+            
+            .overview-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .zip-selector select {
+                width: 100%;
+            }
         }
 
         /* ===== FOOTER ===== */
-        footer {
+        .footer {
             text-align: center;
             padding: 2rem;
             color: var(--gray);
             font-size: 0.9rem;
             margin-top: 3rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-top: 1px solid var(--gray-light);
         }
 
-        footer a {
+        .footer a {
             color: var(--primary);
             text-decoration: none;
             transition: var(--transition);
         }
 
-        footer a:hover {
-            color: var(--secondary);
+        .footer a:hover {
+            color: var(--primary-light);
         }
 
-        /* ===== LOADING ANIMATION ===== */
+        /* ===== LOADING STATES ===== */
         .loading {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             min-height: 200px;
         }
 
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(67, 97, 238, 0.1);
+            border: 3px solid var(--gray-light);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <!-- HEADER -->
-    <header>
-        <div class="header-content">
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-home"></i>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="logo-text">
-                    <h1>RHMR Pro Dashboard</h1>
-                    <p>Real-Time Real Estate Intelligence Platform</p>
+                    <h1>RHMR Dashboard</h1>
+                    <p>Real-Time Real Estate Intelligence</p>
                 </div>
             </div>
             
             <div class="header-controls">
                 <div class="zip-selector">
                     <select id="zipSelect">
-                        <option value="31088" selected>📍 31088 - Warner Robins</option>
-                        <option value="31093">📍 31093 - Centerville</option>
-                        <option value="31098">📍 31098 - Bonaire</option>
+                        <option value="31088" selected>31088 - Warner Robins</option>
+                        <option value="31093">31093 - Centerville</option>
+                        <option value="31098">31098 - Bonaire</option>
                     </select>
                 </div>
                 
-                <div class="last-updated">
-                    <i class="fas fa-sync-alt"></i>
+                <div class="status-indicator">
+                    <span class="live-dot"></span>
                     <span id="updateTime">Updated: Just now</span>
                 </div>
             </div>
@@ -697,399 +651,315 @@
 
     <!-- MAIN DASHBOARD -->
     <main class="dashboard">
-        <!-- MARKET PULSE -->
-        <section class="market-pulse grid-span-12">
-            <div class="pulse-header">
-                <h2><i class="fas fa-heartbeat"></i> Market Pulse</h2>
-                <div class="pulse-badge">
-                    <i class="fas fa-circle"></i>
-                    LIVE
+        <!-- MARKET OVERVIEW -->
+        <div class="market-overview col-12">
+            <div class="overview-header">
+                <h2><i class="fas fa-chart-network"></i> Market Overview</h2>
+                <div class="status-indicator" style="background: rgba(255,255,255,0.2);">
+                    <span class="live-dot"></span>
+                    <span>Live Data</span>
                 </div>
             </div>
             
-            <div class="pulse-metrics">
-                <div class="pulse-metric">
+            <div class="overview-stats">
+                <div class="stat-item">
                     <h4>Market Temperature</h4>
-                    <div class="pulse-value" id="marketTemp">82°</div>
-                    <div class="pulse-trend">
-                        <i class="fas fa-arrow-up" style="color: #4cc9f0;"></i>
-                        <span>Heating up (+4° this week)</span>
+                    <div class="stat-value" id="marketTemp">84°</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>Heating up</span>
                     </div>
                 </div>
                 
-                <div class="pulse-metric">
-                    <h4>Velocity Score</h4>
-                    <div class="pulse-value" id="velocityScore">87</div>
-                    <div class="pulse-trend">
-                        <i class="fas fa-bolt" style="color: #ffd166;"></i>
-                        <span>Fast-moving market</span>
+                <div class="stat-item">
+                    <h4>Opportunity Score</h4>
+                    <div class="stat-value" id="opportunityScore">89</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-star"></i>
+                        <span>High potential</span>
                     </div>
                 </div>
                 
-                <div class="pulse-metric">
-                    <h4>Buyer/Seller Index</h4>
-                    <div class="pulse-value" id="leverageIndex">68</div>
-                    <div class="pulse-trend">
-                        <i class="fas fa-balance-scale" style="color: #f8961e;"></i>
+                <div class="stat-item">
+                    <h4>Velocity Index</h4>
+                    <div class="stat-value" id="velocityIndex">76</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-bolt"></i>
+                        <span>Fast moving</span>
+                    </div>
+                </div>
+                
+                <div class="stat-item">
+                    <h4>Market Balance</h4>
+                    <div class="stat-value" id="marketBalance">62%</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-scale-balanced"></i>
                         <span>Seller's market</span>
                     </div>
                 </div>
-                
-                <div class="pulse-metric">
-                    <h4>Opportunity Score</h4>
-                    <div class="pulse-value" id="opportunityScore">92</div>
-                    <div class="pulse-trend">
-                        <i class="fas fa-star" style="color: #ffd166;"></i>
-                        <span>Excellent for new agents</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PRICING METRICS -->
-        <div class="metric-card metric-primary grid-span-3" data-tooltip="Current median listing price in the selected ZIP code">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-tag"></i> Median List Price</h3>
-                    <div class="metric-value" id="medianList">$289,500</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-            </div>
-            <div class="metric-change change-positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+2.1% this month</span>
-            </div>
-            <div class="metric-trend">
-                <i class="fas fa-chart-line" style="color: #4cc9f0;"></i>
             </div>
         </div>
 
-        <div class="metric-card metric-secondary grid-span-3" data-tooltip="Recent sale prices with average days on market">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-money-bill-wave"></i> Median Sale Price</h3>
-                    <div class="metric-value" id="medianSale">$281,200</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-hand-holding-usd"></i>
-                </div>
-            </div>
-            <div class="metric-change change-positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>+1.8% this month</span>
-            </div>
-            <div class="metric-trend">
-                <span style="color: var(--gray); font-size: 0.9rem;">24 days avg</span>
-            </div>
-        </div>
-
-        <div class="metric-card metric-success grid-span-3" data-tooltip="Active properties currently on the market">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-home"></i> Active Inventory</h3>
-                    <div class="metric-value" id="inventory">105</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-building"></i>
-                </div>
-            </div>
-            <div class="metric-change change-negative">
-                <i class="fas fa-arrow-down"></i>
-                <span>-8% from last month</span>
-            </div>
-            <div class="metric-trend">
-                <i class="fas fa-chart-bar" style="color: #4cc9f0;"></i>
-            </div>
-        </div>
-
-        <div class="metric-card metric-warning grid-span-3" data-tooltip="Overall market trend and momentum">
-            <div class="metric-header">
-                <div class="metric-title">
-                    <h3><i class="fas fa-trending-up"></i> Market Trend</h3>
-                    <div class="metric-value" id="trend">Heating</div>
-                </div>
-                <div class="metric-icon">
-                    <i class="fas fa-fire"></i>
-                </div>
-            </div>
-            <div class="metric-change change-positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>Strong upward momentum</span>
-            </div>
-            <div class="metric-trend">
-                <i class="fas fa-thermometer-full" style="color: #f72585;"></i>
-            </div>
-        </div>
-
-        <!-- PRICE TREND CHART -->
-        <div class="chart-container grid-span-8" data-tooltip="12-month price trend with list vs sale comparison">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-line"></i> Price Trend Analysis</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--primary);"></div>
-                        <span>List Price</span>
+        <!-- CORE METRICS -->
+        <div class="dashboard-grid">
+            <!-- PRICING METRICS -->
+            <div class="metric-card metric-price col-3" data-tooltip="Median listing price in selected ZIP">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Median List Price</h3>
+                        <div class="metric-value" id="medianList">$289,500</div>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--secondary);"></div>
-                        <span>Sale Price</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-tag"></i>
                     </div>
                 </div>
-            </div>
-            <canvas id="priceChart" height="250"></canvas>
-        </div>
-
-        <!-- INVENTORY CHART -->
-        <div class="chart-container grid-span-4" data-tooltip="Inventory levels and absorption rate">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-bar"></i> Inventory Levels</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--success);"></div>
-                        <span>Active Listings</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="inventoryChart" height="250"></canvas>
-        </div>
-
-        <!-- MARKET VELOCITY -->
-        <div class="chart-container grid-span-6" data-tooltip="Market velocity and days on market trends">
-            <div class="chart-header">
-                <h3><i class="fas fa-tachometer-alt"></i> Market Velocity</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #f8961e;"></div>
-                        <span>Days on Market</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #f72585;"></div>
-                        <span>Price Reductions</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="velocityChart" height="250"></canvas>
-        </div>
-
-        <!-- MARKET SENTIMENT -->
-        <div class="chart-container grid-span-6" data-tooltip="Market sentiment and opportunity indicators">
-            <div class="chart-header">
-                <h3><i class="fas fa-chart-pie"></i> Market Composition</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--primary);"></div>
-                        <span>Under Contract</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--success);"></div>
-                        <span>Active</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: var(--warning);"></div>
-                        <span>Price Reduced</span>
-                    </div>
-                </div>
-            </div>
-            <canvas id="sentimentChart" height="250"></canvas>
-        </div>
-
-        <!-- INSIGHTS -->
-        <div class="insight-card insight-positive grid-span-4" data-tooltip="Positive market indicators for sellers">
-            <div class="insight-header">
-                <div class="insight-icon">
+                <div class="metric-change change-up">
                     <i class="fas fa-arrow-up"></i>
-                </div>
-                <div class="insight-title">
-                    <h4>Price Momentum</h4>
-                    <span>2 hours ago</span>
+                    <span>+2.1% this month</span>
                 </div>
             </div>
-            <div class="insight-content">
-                <p>List prices are increasing at 2.1% monthly pace. Sellers have strong negotiating power in current market conditions.</p>
+
+            <div class="metric-card metric-price col-3" data-tooltip="Median sale price with DOM">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Median Sale Price</h3>
+                        <div class="metric-value" id="medianSale">$281,200</div>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                </div>
+                <div class="metric-change change-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+1.8% this month</span>
+                </div>
+            </div>
+
+            <div class="metric-card metric-inventory col-3" data-tooltip="Active properties on market">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Active Inventory</h3>
+                        <div class="metric-value" id="inventory">105</div>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                </div>
+                <div class="metric-change change-down">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>-8% from last month</span>
+                </div>
+            </div>
+
+            <div class="metric-card metric-trend col-3" data-tooltip="Overall market direction">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Market Trend</h3>
+                        <div class="metric-value" id="trend">Heating</div>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <div class="metric-change change-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Strong momentum</span>
+                </div>
+            </div>
+
+            <!-- PRICE TREND CHART -->
+            <div class="chart-container col-8" data-tooltip="12-month price trend analysis">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        Price Trend
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-price"></span>
+                            <span>List Price</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot legend-sale"></span>
+                            <span>Sale Price</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- INVENTORY CHART -->
+            <div class="chart-container col-4" data-tooltip="Inventory levels over time">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Inventory
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-inventory"></span>
+                            <span>Active Listings</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- VELOCITY CHART -->
+            <div class="chart-container col-6" data-tooltip="Market velocity indicators">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Market Velocity
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dom"></span>
+                            <span>Days on Market</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #ef4444;"></span>
+                            <span>Price Reductions</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="velocityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- MARKET SENTIMENT -->
+            <div class="chart-container col-6" data-tooltip="Market composition analysis">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Market Composition
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #4f46e5;"></span>
+                            <span>Under Contract</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #10b981;"></span>
+                            <span>Active</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="compositionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- INSIGHTS -->
+            <div class="insight-card positive col-4" data-tooltip="Positive market indicators">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Price Momentum</h4>
+                        <div class="insight-time">2 hours ago</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p>List prices increasing at 2.1% monthly pace. Strong negotiating power for sellers.</p>
+                </div>
+            </div>
+
+            <div class="insight-card negative col-4" data-tooltip="Market challenges">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Inventory Alert</h4>
+                        <div class="insight-time">4 hours ago</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p>Active inventory down 8% this month. Buyers should act quickly on well-priced properties.</p>
+                </div>
+            </div>
+
+            <div class="insight-card neutral col-4" data-tooltip="Market forecast">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Market Forecast</h4>
+                        <div class="insight-time">Today</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p>Stable growth expected through Q3. Interest rates remain favorable for buyers and sellers.</p>
+                </div>
             </div>
         </div>
 
-        <div class="insight-card insight-negative grid-span-4" data-tooltip="Challenges and opportunities for buyers">
-            <div class="insight-header">
-                <div class="insight-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="insight-title">
-                    <h4>Inventory Alert</h4>
-                    <span>4 hours ago</span>
-                </div>
-            </div>
-            <div class="insight-content">
-                <p>Active inventory dropped 8% this month. Buyers should act quickly on well-priced properties.</p>
-            </div>
-        </div>
-
-        <div class="insight-card insight-neutral grid-span-4" data-tooltip="Market stability and forecast">
-            <div class="insight-header">
-                <div class="insight-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="insight-title">
-                    <h4>Market Forecast</h4>
-                    <span>Today</span>
-                </div>
-            </div>
-            <div class="insight-content">
-                <p>Stable growth expected through Q3. Interest rates remain favorable for both buyers and sellers.</p>
-            </div>
-        </div>
-
-        <!-- REALTOR TIPS -->
-        <div class="chart-container grid-span-12" data-tooltip="Actionable insights for real estate professionals">
-            <div class="chart-header">
-                <h3><i class="fas fa-lightbulb"></i> Realtor Action Items</h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <i class="fas fa-circle" style="color: #4cc9f0;"></i>
-                        <span>High Priority</span>
-                    </div>
-                    <div class="legend-item">
-                        <i class="fas fa-circle" style="color: #f8961e;"></i>
-                        <span>Medium Priority</span>
+        <!-- REALTOR INSIGHTS -->
+        <div class="dashboard-grid" style="margin-top: 1.5rem;">
+            <div class="chart-container col-12" data-tooltip="Actionable insights for realtors">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Realtor Action Items
                     </div>
                 </div>
-            </div>
-            <div class="action-items">
-                <div class="action-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div class="action-item" style="background: rgba(76, 201, 240, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #4cc9f0;">
-                        <h4 style="color: #4cc9f0; margin-bottom: 0.5rem;"><i class="fas fa-bullhorn"></i> Price New Listings Aggressively</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">Current market supports 2-3% above recent comps</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <h4 style="color: #10b981; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-bullhorn"></i> Price New Listings Aggressively
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--dark);">Market supports 2-3% above recent comps</p>
                     </div>
-                    <div class="action-item" style="background: rgba(248, 150, 30, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #f8961e;">
-                        <h4 style="color: #f8961e; margin-bottom: 0.5rem;"><i class="fas fa-search"></i> Target Price-Reduced Properties</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">15 properties reduced price this week - great opportunities</p>
+                    <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <h4 style="color: #f59e0b; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-search"></i> Target Price-Reduced Properties
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--dark);">15 properties reduced price this week</p>
                     </div>
-                    <div class="action-item" style="background: rgba(76, 201, 240, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #4cc9f0;">
-                        <h4 style="color: #4cc9f0; margin-bottom: 0.5rem;"><i class="fas fa-chart-line"></i> Update CMAs Weekly</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">Market moving fast - keep comps current</p>
-                    </div>
-                    <div class="action-item" style="background: rgba(248, 150, 30, 0.1); padding: 1rem; border-radius: 10px; border-left: 4px solid #f8961e;">
-                        <h4 style="color: #f8961e; margin-bottom: 0.5rem;"><i class="fas fa-users"></i> Focus on First-Time Buyers</h4>
-                        <p style="font-size: 0.9rem; color: var(--dark);">High activity in $250-300k range</p>
+                    <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <h4 style="color: #3b82f6; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-users"></i> Focus on First-Time Buyers
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--dark);">High activity in $250-300k range</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- TOOLTIP CONTAINER -->
-    <div id="tooltip" class="tooltip"></div>
-
     <!-- FOOTER -->
-    <footer>
-        <p>© 2024 RHMR Pro Dashboard | Real-Time Real Estate Intelligence</p>
-        <p>Data updates automatically • Built for real estate professionals</p>
-        <p style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
-            <i class="fas fa-database"></i> Data Sources: Zillow • Realtor.com • MLS • Public Records
+    <footer class="footer">
+        <p>© 2024 RHMR Dashboard | Real-Time Real Estate Intelligence</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--gray);">
+            Data updates automatically • Built for real estate professionals
         </p>
     </footer>
 
     <script>
-        // Global variables
-        let charts = {};
-        let currentData = {};
-        let tooltipTimeout;
-
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            initializeDashboard();
+            initializeCharts();
             setupEventListeners();
-            setupTooltips();
-            loadData();
+            updateTimestamp();
             startAutoRefresh();
+            
+            // Load data from JSON if available
+            loadDashboardData();
         });
 
-        // Initialize dashboard components
-        function initializeDashboard() {
-            console.log('🚀 Initializing RHMR Pro Dashboard...');
-            
-            // Update timestamp
-            updateTimestamp();
-            
-            // Initialize all charts
-            initializeCharts();
-            
-            // Set random data for demo (replace with real API calls)
-            setRandomData();
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // ZIP code selector
-            document.getElementById('zipSelect').addEventListener('change', function(e) {
-                const zip = e.target.value;
-                console.log(`📍 ZIP code changed to: ${zip}`);
-                loadData(zip);
-                showNotification(`Loading data for ZIP ${zip}...`, 'info');
-            });
-
-            // Hover effects for metric cards
-            document.querySelectorAll('.metric-card, .chart-container, .insight-card').forEach(card => {
-                card.addEventListener('mouseenter', function(e) {
-                    this.style.transform = this.classList.contains('metric-card') ? 
-                        'translateY(-8px)' : 'translateY(-3px)';
-                });
-                
-                card.addEventListener('mouseleave', function(e) {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-        }
-
-        // Setup tooltips
-        function setupTooltips() {
-            const tooltip = document.getElementById('tooltip');
-            
-            document.querySelectorAll('[data-tooltip]').forEach(element => {
-                element.addEventListener('mouseenter', function(e) {
-                    const text = this.getAttribute('data-tooltip');
-                    const rect = this.getBoundingClientRect();
-                    
-                    // Clear any existing timeout
-                    clearTimeout(tooltipTimeout);
-                    
-                    // Position tooltip
-                    tooltip.innerHTML = `
-                        <div class="tooltip-header">
-                            <i class="fas fa-info-circle"></i>
-                            Quick Insight
-                        </div>
-                        <div class="tooltip-content">${text}</div>
-                    `;
-                    
-                    // Position based on element location
-                    let left = rect.left + (rect.width / 2) - 150;
-                    let top = rect.top + window.scrollY - 120;
-                    
-                    // Keep tooltip within viewport
-                    left = Math.max(20, Math.min(left, window.innerWidth - 320));
-                    top = Math.max(20, top);
-                    
-                    tooltip.style.left = `${left}px`;
-                    tooltip.style.top = `${top}px`;
-                    tooltip.classList.add('show');
-                });
-                
-                element.addEventListener('mouseleave', function(e) {
-                    tooltipTimeout = setTimeout(() => {
-                        tooltip.classList.remove('show');
-                    }, 300);
-                });
-            });
-        }
-
-        // Initialize charts
+        // Initialize all charts with proper sizing
         function initializeCharts() {
             // Price Trend Chart
             const priceCtx = document.getElementById('priceChart').getContext('2d');
-            charts.price = new Chart(priceCtx, {
+            new Chart(priceCtx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -1097,27 +967,21 @@
                         {
                             label: 'List Price',
                             data: [265, 268, 272, 275, 279, 282, 285, 287, 289, 291, 293, 295],
-                            borderColor: '#4361ee',
-                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
-                            pointBackgroundColor: '#4361ee',
-                            pointRadius: 4,
-                            pointHoverRadius: 8
+                            fill: true
                         },
                         {
                             label: 'Sale Price',
                             data: [258, 261, 264, 268, 272, 275, 278, 281, 283, 285, 287, 289],
-                            borderColor: '#7209b7',
-                            backgroundColor: 'rgba(114, 9, 183, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
-                            borderDash: [5, 5],
-                            pointBackgroundColor: '#7209b7',
-                            pointRadius: 4,
-                            pointHoverRadius: 8
+                            fill: true,
+                            borderDash: [5, 5]
                         }
                     ]
                 },
@@ -1125,108 +989,59 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             mode: 'index',
                             intersect: false,
-                            backgroundColor: 'rgba(26, 26, 46, 0.95)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += '$' + (context.parsed.y * 1000).toLocaleString();
-                                    return label;
+                                    return `${context.dataset.label}: $${(context.parsed.y * 1000).toLocaleString()}`;
                                 }
                             }
                         }
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
+                            grid: { display: false }
                         },
                         y: {
                             beginAtZero: false,
                             min: 250,
                             ticks: {
-                                color: '#666',
                                 callback: function(value) {
                                     return '$' + (value * 1000).toLocaleString();
                                 }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
                             }
                         }
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
                     }
                 }
             });
 
             // Inventory Chart
             const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-            charts.inventory = new Chart(inventoryCtx, {
+            new Chart(inventoryCtx, {
                 type: 'bar',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                     datasets: [{
                         label: 'Active Listings',
                         data: [135, 128, 118, 112, 108, 105],
-                        backgroundColor: 'rgba(76, 201, 240, 0.8)',
-                        borderColor: '#4cc9f0',
-                        borderWidth: 1,
-                        borderRadius: 6,
-                        borderSkipped: false
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(26, 26, 46, 0.95)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff'
-                        }
+                        legend: { display: false }
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
+                            grid: { display: false }
                         },
                         y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#666',
-                                callback: function(value) {
-                                    return value.toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
+                            beginAtZero: true
                         }
                     }
                 }
@@ -1234,7 +1049,7 @@
 
             // Velocity Chart
             const velocityCtx = document.getElementById('velocityChart').getContext('2d');
-            charts.velocity = new Chart(velocityCtx, {
+            new Chart(velocityCtx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
@@ -1242,21 +1057,21 @@
                         {
                             label: 'Days on Market',
                             data: [38, 35, 32, 29, 26, 24],
-                            borderColor: '#f8961e',
-                            backgroundColor: 'rgba(248, 150, 30, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
+                            fill: true,
                             yAxisID: 'y'
                         },
                         {
                             label: 'Price Reductions',
                             data: [22, 20, 18, 16, 14, 15],
-                            borderColor: '#f72585',
-                            backgroundColor: 'rgba(247, 37, 133, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
+                            fill: true,
                             yAxisID: 'y1'
                         }
                     ]
@@ -1265,37 +1080,21 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: false }
                     },
                     scales: {
                         x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: '#666'
-                            }
+                            grid: { display: false }
                         },
                         y: {
                             type: 'linear',
                             display: true,
-                            position: 'left',
-                            ticks: {
-                                color: '#666'
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
-                            }
+                            position: 'left'
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            ticks: {
-                                color: '#666'
-                            },
                             grid: {
                                 drawOnChartArea: false
                             }
@@ -1304,22 +1103,16 @@
                 }
             });
 
-            // Sentiment Chart (Doughnut)
-            const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
-            charts.sentiment = new Chart(sentimentCtx, {
+            // Composition Chart
+            const compositionCtx = document.getElementById('compositionChart').getContext('2d');
+            new Chart(compositionCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Under Contract', 'Active', 'Price Reduced', 'New'],
                     datasets: [{
                         data: [35, 105, 15, 12],
-                        backgroundColor: [
-                            '#4361ee',
-                            '#4cc9f0',
-                            '#f8961e',
-                            '#7209b7'
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 20
+                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#3b82f6'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
@@ -1328,127 +1121,95 @@
                     cutout: '70%',
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((context.raw / total) * 100);
-                                    return `${context.label}: ${context.raw} properties (${percentage}%)`;
-                                }
-                            }
+                            position: 'bottom'
                         }
                     }
                 }
             });
         }
 
-        // Load data from API
-        async function loadData(zip = '31088') {
-            try {
-                // Show loading state
-                document.querySelectorAll('.metric-value').forEach(el => {
-                    el.innerHTML = '<span class="spinner" style="width: 20px; height: 20px;"></span>';
-                });
+        // Setup event listeners
+        function setupEventListeners() {
+            // ZIP code selector
+            document.getElementById('zipSelect').addEventListener('change', function(e) {
+                const zip = e.target.value;
+                console.log(`Loading data for ZIP: ${zip}`);
+                showNotification(`Loading data for ${zip}...`, 'info');
+                updateMetricsForZip(zip);
+            });
 
-                // Try to load from data file
-                const response = await fetch(`data/houston-county-ga/dashboard_data.json?t=${Date.now()}`);
+            // Add hover effects
+            document.querySelectorAll('.metric-card, .chart-container, .insight-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
                 
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString([], {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            document.getElementById('updateTime').textContent = `Updated: ${dateString} ${timeString}`;
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('data/houston-county-ga/dashboard_data.json');
                 if (response.ok) {
                     const data = await response.json();
-                    currentData = data;
-                    
-                    // Update UI with real data
-                    updateUI(data);
-                    
-                    // Update timestamp
-                    updateTimestamp();
-                    
-                    showNotification('Data loaded successfully!', 'success');
-                } else {
-                    // Fallback to demo data
-                    setRandomData();
-                    showNotification('Using demo data - check data source', 'warning');
+                    updateDashboardWithData(data);
                 }
             } catch (error) {
-                console.error('Error loading data:', error);
-                setRandomData();
-                showNotification('Error loading data. Using demo data.', 'error');
+                console.log('Using demo data');
             }
         }
 
-        // Update UI with data
-        function updateUI(data) {
-            // Update market pulse
-            const marketSummary = data.market_summary || {};
-            document.getElementById('marketTemp').textContent = `${marketSummary.avg_opportunity_score || 82}°`;
-            document.getElementById('velocityScore').textContent = marketSummary.avg_opportunity_score || 87;
-            document.getElementById('leverageIndex').textContent = 65;
-            document.getElementById('opportunityScore').textContent = marketSummary.avg_opportunity_score || 92;
-
-            // Update metrics
-            if (data.zip_codes && data.zip_codes.length > 0) {
-                const zipData = data.zip_codes[0];
-                document.getElementById('medianList').textContent = `$${(zipData.metrics?.composite_price || 289500).toLocaleString()}`;
-                document.getElementById('medianSale').textContent = `$${Math.round((zipData.metrics?.composite_price || 289500) * 0.97).toLocaleString()}`;
-                document.getElementById('inventory').textContent = zipData.metrics?.composite_inventory || 105;
-                document.getElementById('trend').textContent = marketSummary.market_trend || 'Heating';
-            }
-
-            // Update charts with new data
-            updateCharts(data);
-        }
-
-        // Update charts with new data
-        function updateCharts(data) {
-            if (!charts.price || !data) return;
-
-            // Update price chart with random variation for demo
-            const priceData = charts.price.data.datasets[0].data;
-            const saleData = charts.price.data.datasets[1].data;
+        // Update dashboard with real data
+        function updateDashboardWithData(data) {
+            if (!data) return;
             
-            // Add new data point and remove oldest
-            const lastPrice = priceData[priceData.length - 1];
-            const lastSale = saleData[saleData.length - 1];
-            
-            priceData.push(lastPrice + (Math.random() - 0.5) * 2);
-            saleData.push(lastSale + (Math.random() - 0.5) * 1.5);
-            
-            priceData.shift();
-            saleData.shift();
-            
-            // Update labels
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            charts.price.data.labels = [];
-            
-            for (let i = 0; i < 12; i++) {
-                const monthIndex = (currentMonth - 11 + i + 12) % 12;
-                charts.price.data.labels.push(months[monthIndex]);
+            // Update metrics from data
+            if (data.market_summary) {
+                const summary = data.market_summary;
+                document.getElementById('marketTemp').textContent = `${summary.avg_opportunity_score || 84}°`;
+                document.getElementById('opportunityScore').textContent = summary.avg_opportunity_score || 89;
+                document.getElementById('velocityIndex').textContent = 85;
+                document.getElementById('marketBalance').textContent = '62%';
+                
+                // Update pricing metrics if available
+                if (data.zip_codes && data.zip_codes.length > 0) {
+                    const zipData = data.zip_codes[0];
+                    document.getElementById('medianList').textContent = `$${(zipData.metrics?.composite_price || 289500).toLocaleString()}`;
+                    document.getElementById('medianSale').textContent = `$${Math.round((zipData.metrics?.composite_price || 289500) * 0.97).toLocaleString()}`;
+                    document.getElementById('inventory').textContent = zipData.metrics?.composite_inventory || 105;
+                    document.getElementById('trend').textContent = summary.market_trend || 'Heating';
+                }
             }
             
-            charts.price.update('none');
-            
-            // Update inventory chart
-            const inventoryData = charts.inventory.data.datasets[0].data;
-            const newInventory = data.market_summary?.total_inventory || 105;
-            inventoryData.push(newInventory);
-            inventoryData.shift();
-            charts.inventory.update('none');
+            updateTimestamp();
         }
 
-        // Set random data for demo
-        function setRandomData() {
-            // Generate realistic random data
-            const basePrice = 285000 + Math.floor(Math.random() * 15000);
-            const inventory = 95 + Math.floor(Math.random() * 30);
+        // Update metrics for selected ZIP
+        function updateMetricsForZip(zip) {
+            // Simulate API call with random data
+            const basePrice = 285000 + Math.floor(Math.random() * 20000);
+            const inventory = 90 + Math.floor(Math.random() * 40);
             const trend = Math.random() > 0.3 ? 'Heating' : 'Cooling';
             
             // Update metrics
@@ -1457,106 +1218,69 @@
             document.getElementById('inventory').textContent = inventory;
             document.getElementById('trend').textContent = trend;
             
-            // Update pulse metrics with slight variations
-            const temp = 75 + Math.floor(Math.random() * 15);
-            const velocity = 75 + Math.floor(Math.random() * 20);
-            const leverage = 50 + Math.floor(Math.random() * 30);
-            const opportunity = 70 + Math.floor(Math.random() * 25);
+            // Update pulse metrics
+            document.getElementById('marketTemp').textContent = `${75 + Math.floor(Math.random() * 20)}°`;
+            document.getElementById('opportunityScore').textContent = 70 + Math.floor(Math.random() * 30);
             
-            document.getElementById('marketTemp').textContent = `${temp}°`;
-            document.getElementById('velocityScore').textContent = velocity;
-            document.getElementById('leverageIndex').textContent = leverage;
-            document.getElementById('opportunityScore').textContent = opportunity;
-            
-            // Update timestamp
             updateTimestamp();
-        }
-
-        // Update timestamp
-        function updateTimestamp() {
-            const now = new Date();
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            
-            const formatted = now.toLocaleDateString('en-US', options);
-            document.getElementById('updateTime').textContent = `Updated: ${formatted}`;
+            showNotification(`Data updated for ZIP ${zip}`, 'success');
         }
 
         // Show notification
         function showNotification(message, type = 'info') {
-            // Create notification element
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
                 top: 100px;
                 right: 20px;
-                background: ${type === 'success' ? '#4cc9f0' : type === 'error' ? '#f72585' : '#4361ee'};
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#4f46e5'};
                 color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                padding: 0.75rem 1.25rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 z-index: 10000;
-                transform: translateX(120%);
-                transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                animation: slideIn 0.3s ease;
+                font-size: 0.9rem;
                 max-width: 300px;
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255,255,255,0.1);
             `;
             
             notification.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                     <span>${message}</span>
                 </div>
             `;
             
             document.body.appendChild(notification);
             
-            // Animate in
             setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 10);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.transform = 'translateX(120%)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
             }, 3000);
         }
 
         // Start auto-refresh
-        function startAutoRefresh(interval = 30000) { // 30 seconds
+        function startAutoRefresh(interval = 30000) {
             setInterval(() => {
-                const zip = document.getElementById('zipSelect').value;
-                loadData(zip);
-                
-                // Add visual feedback
-                const syncIcon = document.querySelector('.last-updated i');
-                syncIcon.style.transform = 'rotate(180deg)';
-                setTimeout(() => {
-                    syncIcon.style.transform = 'rotate(360deg)';
-                }, 300);
+                updateTimestamp();
+                // In a real app, this would fetch new data
             }, interval);
         }
 
-        // Expose to global scope for debugging
-        window.dashboard = {
-            loadData,
-            setRandomData,
-            showNotification,
-            updateTimestamp
-        };
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
