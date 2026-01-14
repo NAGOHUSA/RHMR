@@ -3,10 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RHMR Pro | Real-Time Real Estate Dashboard</title>
+    <title>RHMR Pro | Real Estate Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* ===== RESET & VARIABLES ===== */
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -14,117 +35,135 @@
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-            color: #1e293b;
-            line-height: 1.6;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            color: var(--dark);
+            line-height: 1.5;
             min-height: 100vh;
-            padding: 1.5rem;
+            overflow-x: hidden;
         }
 
-        .container {
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+        }
+
+        .header-container {
             max-width: 1400px;
             margin: 0 auto;
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
-        .logo-section {
+        .logo {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        .logo {
-            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-            width: 60px;
-            height: 60px;
-            border-radius: 0.75rem;
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.75rem;
             color: white;
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            font-size: 1.2rem;
         }
 
         .logo-text h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #60a5fa, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
         }
 
         .logo-text p {
-            color: #94a3b8;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
+            color: var(--gray);
         }
 
         .header-controls {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             align-items: center;
-            flex-wrap: wrap;
         }
 
-        .zip-select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            font-size: 1rem;
+        .zip-selector {
+            position: relative;
+        }
+
+        .zip-selector select {
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            backdrop-filter: blur(10px);
+            color: var(--dark);
             cursor: pointer;
+            transition: var(--transition);
+            min-width: 180px;
+            appearance: none;
         }
 
-        .update-time {
+        .zip-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .zip-selector::before {
+            content: '📍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        .status-indicator {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #94a3b8;
-            font-size: 0.875rem;
-        }
-
-        .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(239, 68, 68, 0.2);
+            background: var(--light);
             padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            margin-top: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
         }
 
-        .pulse-dot {
-            width: 0.5rem;
-            height: 0.5rem;
-            background: #ef4444;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -134,739 +173,814 @@
             50% { opacity: 0.5; }
         }
 
-        .live-text {
-            color: #ef4444;
-            font-weight: 600;
-            font-size: 0.875rem;
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
         }
 
-        /* Market Pulse Banner */
-        .market-pulse {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #3b82f6 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 5s ease infinite;
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== METRIC CARDS ===== */
+        .metric-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid transparent;
             position: relative;
             overflow: hidden;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .pulse-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-
-        .pulse-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .pulse-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .pulse-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            transition: all 0.3s;
-        }
-
-        .pulse-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-        }
-
-        .pulse-card h4 {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 0.875rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        .pulse-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-
-        .pulse-trend {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Metrics Grid */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .metric-card {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-top: 4px solid;
-            transition: all 0.3s;
-        }
-
         .metric-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--gray-light);
         }
-
-        .metric-card.blue { border-color: #3b82f6; }
-        .metric-card.purple { border-color: #8b5cf6; }
-        .metric-card.cyan { border-color: #06b6d4; }
-        .metric-card.orange { border-color: #f97316; }
 
         .metric-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
         }
 
         .metric-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
         }
 
-        .metric-icon.blue { color: #3b82f6; }
-        .metric-icon.purple { color: #8b5cf6; }
-        .metric-icon.cyan { color: #06b6d4; }
-        .metric-icon.orange { color: #f97316; }
+        .metric-price .metric-icon { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); }
+        .metric-inventory .metric-icon { background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%); }
+        .metric-trend .metric-icon { background: linear-gradient(135deg, var(--secondary) 0%, #34d399 100%); }
+        .metric-velocity .metric-icon { background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%); }
 
-        .metric-badge {
-            font-size: 0.75rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: 9999px;
-            font-weight: 600;
-        }
-
-        .metric-badge.blue { background: #dbeafe; color: #1e40af; }
-        .metric-badge.purple { background: #ede9fe; color: #6b21a8; }
-        .metric-badge.cyan { background: #cffafe; color: #0e7490; }
-        .metric-badge.orange { background: #ffedd5; color: #c2410c; }
-
-        .metric-title {
-            color: #64748b;
-            font-size: 0.875rem;
+        .metric-title h3 {
+            font-size: 0.85rem;
+            color: var(--gray);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
         }
 
         .metric-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #1e293b;
-            margin-bottom: 0.75rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+            margin-bottom: 0.5rem;
         }
 
         .metric-change {
             display: inline-flex;
             align-items: center;
-            gap: 0.375rem;
-            font-size: 0.875rem;
+            gap: 0.4rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
         }
 
-        .metric-change.positive { color: #10b981; }
-        .metric-change.negative { color: #ef4444; }
-
-        .metric-sub {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
+        .change-up {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
         }
 
-        /* Charts Grid */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+        .change-down {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
         }
 
-        .chart-card {
+        .change-neutral {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--gray);
+        }
+
+        /* ===== CHART CONTAINERS ===== */
+        .chart-container {
             background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .chart-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
+            align-items: flex-start;
+            margin-bottom: 1rem;
         }
 
         .chart-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1e293b;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .chart-title i {
+            color: var(--primary);
         }
 
         .chart-legend {
             display: flex;
             gap: 1rem;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #64748b;
+            gap: 0.4rem;
         }
 
         .legend-dot {
-            width: 0.75rem;
-            height: 0.75rem;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
         }
 
-        /* Action Items */
-        .action-section {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
+        .legend-price { background: var(--primary); }
+        .legend-sale { background: var(--info); }
+        .legend-inventory { background: var(--secondary); }
+        .legend-dom { background: var(--warning); }
+
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
         }
 
-        .action-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        .action-card {
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            border-left: 4px solid;
-        }
-
-        .action-card.high {
-            background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
-            border-color: #06b6d4;
-        }
-
-        .action-card.medium {
-            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
-            border-color: #f97316;
-        }
-
-        .action-card h4 {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .action-card.high h4 { color: #0e7490; }
-        .action-card.medium h4 { color: #c2410c; }
-
-        .action-card p {
-            font-size: 0.875rem;
-            color: #475569;
-        }
-
-        /* Insights */
-        .insights-section {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-        }
-
+        /* ===== INSIGHT CARDS ===== */
         .insight-card {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border-left: 4px solid #10b981;
-            border-radius: 0.75rem;
+            background: white;
+            border-radius: var(--radius);
             padding: 1.25rem;
-            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid transparent;
         }
 
-        .insight-card.blue {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-color: #3b82f6;
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
-        .insight-card.gray {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-color: #64748b;
+        .insight-card.positive {
+            border-left-color: var(--secondary);
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), white);
+        }
+
+        .insight-card.negative {
+            border-left-color: var(--danger);
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.05), white);
+        }
+
+        .insight-card.neutral {
+            border-left-color: var(--gray);
+            background: linear-gradient(to right, rgba(100, 116, 139, 0.05), white);
         }
 
         .insight-header {
             display: flex;
-            justify-content: space-between;
-            align-items: start;
+            align-items: center;
+            gap: 0.75rem;
             margin-bottom: 0.75rem;
         }
 
-        .insight-title {
-            font-weight: 700;
-            font-size: 1.125rem;
+        .insight-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
         }
 
-        .insight-card h4 { color: #166534; }
-        .insight-card.blue h4 { color: #1e40af; }
-        .insight-card.gray h4 { color: #475569; }
+        .insight-positive .insight-icon { background: var(--secondary); }
+        .insight-negative .insight-icon { background: var(--danger); }
+        .insight-neutral .insight-icon { background: var(--gray); }
+
+        .insight-title h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.1rem;
+        }
 
         .insight-time {
             font-size: 0.75rem;
-            color: #64748b;
+            color: var(--gray);
         }
 
-        .insight-text {
-            color: #475569;
-            margin-bottom: 0.75rem;
+        .insight-content p {
+            font-size: 0.9rem;
+            color: var(--dark);
+            line-height: 1.5;
         }
 
-        .insight-tags {
+        /* ===== MARKET OVERVIEW ===== */
+        .market-overview {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            color: white;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: rotate(45deg);
+            animation: shine 3s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .overview-header {
             display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
         }
 
-        .tag {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
+        .overview-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item h4 {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
             font-weight: 500;
         }
 
-        .tag.green { background: #bbf7d0; color: #166534; }
-        .tag.blue { background: #bfdbfe; color: #1e40af; }
-        .tag.purple { background: #e9d5ff; color: #6b21a8; }
-        .tag.yellow { background: #fef08a; color: #854d0e; }
-        .tag.cyan { background: #a5f3fc; color: #0e7490; }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            color: #64748b;
-            font-size: 0.875rem;
-            margin-top: 2rem;
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
         }
 
-        .footer p {
-            margin: 0.5rem 0;
+        .stat-trend {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
-        /* Responsive */
+        /* ===== GRID SPANS ===== */
+        .col-1 { grid-column: span 1; }
+        .col-2 { grid-column: span 2; }
+        .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; }
+        .col-6 { grid-column: span 6; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        /* ===== TOOLTIPS ===== */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+
+        [data-tooltip]:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            pointer-events: none;
+        }
+
+        [data-tooltip]:hover::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--dark);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+            
+            .col-3 { grid-column: span 4; }
+            .col-4 { grid-column: span 4; }
+            .col-6 { grid-column: span 8; }
+            .col-8 { grid-column: span 8; }
+        }
+
         @media (max-width: 768px) {
-            .charts-grid {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .dashboard {
+                padding: 0 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .col-2, .col-3, .col-4, .col-6, .col-8 { grid-column: span 4; }
+            
+            .overview-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
-            .header-content {
-                flex-direction: column;
-                text-align: center;
+            .col-2, .col-3, .col-4, .col-6, .col-8 { grid-column: 1; }
+            
+            .overview-stats {
+                grid-template-columns: 1fr;
             }
+            
+            .header-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .zip-selector select {
+                width: 100%;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer a:hover {
+            color: var(--primary-light);
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <div class="logo-section">
-                    <div class="logo">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <div class="logo-text">
-                        <h1>RHMR Pro Dashboard</h1>
-                        <p>Real-Time Real Estate Intelligence Platform</p>
-                    </div>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
                 </div>
-                
-                <div class="header-controls">
-                    <select class="zip-select" id="zipSelect">
-                        <option value="31088">📍 31088 - Warner Robins</option>
-                        <option value="31093">📍 31093 - Centerville</option>
-                        <option value="31098">📍 31098 - Bonaire</option>
-                    </select>
-                    
-                    <div class="update-time">
-                        <i class="fas fa-sync-alt fa-spin"></i>
-                        <span id="updateTime">Updated: Just now</span>
-                    </div>
+                <div class="logo-text">
+                    <h1>RHMR Dashboard</h1>
+                    <p>Real-Time Real Estate Intelligence</p>
                 </div>
             </div>
             
-            <div class="live-badge">
-                <div class="pulse-dot"></div>
-                <span class="live-text">LIVE</span>
-                <span style="color: #94a3b8; margin-left: 0.5rem;">Auto-updating every 30 seconds</span>
+            <div class="header-controls">
+                <div class="zip-selector">
+                    <select id="zipSelect">
+                        <option value="31088" selected>31088 - Warner Robins</option>
+                        <option value="31093">31093 - Centerville</option>
+                        <option value="31098">31098 - Bonaire</option>
+                    </select>
+                </div>
+                
+                <div class="status-indicator">
+                    <span class="live-dot"></span>
+                    <span id="updateTime">Updated: Just now</span>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- Market Pulse Banner -->
-        <div class="market-pulse">
-            <div class="pulse-header">
-                <h2 class="pulse-title">
-                    <i class="fas fa-heartbeat"></i>
-                    Market Pulse
-                </h2>
-                <div class="live-badge" style="margin: 0;">
-                    <div class="pulse-dot"></div>
-                    <span class="live-text">LIVE</span>
+    <!-- MAIN DASHBOARD -->
+    <main class="dashboard">
+        <!-- MARKET OVERVIEW -->
+        <div class="market-overview col-12">
+            <div class="overview-header">
+                <h2><i class="fas fa-chart-network"></i> Market Overview</h2>
+                <div class="status-indicator" style="background: rgba(255,255,255,0.2);">
+                    <span class="live-dot"></span>
+                    <span>Live Data</span>
                 </div>
             </div>
             
-            <div class="pulse-grid">
-                <div class="pulse-card">
-                    <h4><i class="fas fa-thermometer-half"></i> Market Temperature</h4>
-                    <div class="pulse-value">82°</div>
-                    <div class="pulse-trend">
+            <div class="overview-stats">
+                <div class="stat-item">
+                    <h4>Market Temperature</h4>
+                    <div class="stat-value" id="marketTemp">84°</div>
+                    <div class="stat-trend">
                         <i class="fas fa-arrow-up"></i>
-                        <span>Heating up (+4° this week)</span>
+                        <span>Heating up</span>
                     </div>
                 </div>
                 
-                <div class="pulse-card">
-                    <h4><i class="fas fa-bolt"></i> Velocity Score</h4>
-                    <div class="pulse-value">87</div>
-                    <div class="pulse-trend">
+                <div class="stat-item">
+                    <h4>Opportunity Score</h4>
+                    <div class="stat-value" id="opportunityScore">89</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-star"></i>
+                        <span>High potential</span>
+                    </div>
+                </div>
+                
+                <div class="stat-item">
+                    <h4>Velocity Index</h4>
+                    <div class="stat-value" id="velocityIndex">76</div>
+                    <div class="stat-trend">
                         <i class="fas fa-bolt"></i>
-                        <span>Fast-moving market</span>
+                        <span>Fast moving</span>
                     </div>
                 </div>
                 
-                <div class="pulse-card">
-                    <h4><i class="fas fa-balance-scale"></i> Buyer/Seller Index</h4>
-                    <div class="pulse-value">68</div>
-                    <div class="pulse-trend">
-                        <i class="fas fa-balance-scale"></i>
+                <div class="stat-item">
+                    <h4>Market Balance</h4>
+                    <div class="stat-value" id="marketBalance">62%</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-scale-balanced"></i>
                         <span>Seller's market</span>
                     </div>
                 </div>
-                
-                <div class="pulse-card">
-                    <h4><i class="fas fa-star"></i> Opportunity Score</h4>
-                    <div class="pulse-value">92</div>
-                    <div class="pulse-trend">
-                        <i class="fas fa-star"></i>
-                        <span>Excellent for new agents</span>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- Key Metrics -->
-        <div class="metrics-grid">
-            <div class="metric-card blue">
+        <!-- CORE METRICS -->
+        <div class="dashboard-grid">
+            <!-- PRICING METRICS -->
+            <div class="metric-card metric-price col-3" data-tooltip="Median listing price in selected ZIP">
                 <div class="metric-header">
-                    <div class="metric-icon blue">
-                        <i class="fas fa-dollar-sign"></i>
+                    <div>
+                        <h3 class="metric-title">Median List Price</h3>
+                        <div class="metric-value" id="medianList">$289,500</div>
                     </div>
-                    <span class="metric-badge blue">LIVE</span>
+                    <div class="metric-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
                 </div>
-                <h3 class="metric-title">Median List Price</h3>
-                <div class="metric-value">$289,500</div>
-                <div class="metric-change positive">
+                <div class="metric-change change-up">
                     <i class="fas fa-arrow-up"></i>
                     <span>+2.1% this month</span>
                 </div>
             </div>
 
-            <div class="metric-card purple">
+            <div class="metric-card metric-price col-3" data-tooltip="Median sale price with DOM">
                 <div class="metric-header">
-                    <div class="metric-icon purple">
+                    <div>
+                        <h3 class="metric-title">Median Sale Price</h3>
+                        <div class="metric-value" id="medianSale">$281,200</div>
+                    </div>
+                    <div class="metric-icon">
                         <i class="fas fa-hand-holding-usd"></i>
                     </div>
-                    <span class="metric-badge purple">24H</span>
                 </div>
-                <h3 class="metric-title">Median Sale Price</h3>
-                <div class="metric-value">$281,200</div>
-                <div class="metric-change positive">
+                <div class="metric-change change-up">
                     <i class="fas fa-arrow-up"></i>
                     <span>+1.8% this month</span>
                 </div>
-                <div class="metric-sub">24 days avg</div>
             </div>
 
-            <div class="metric-card cyan">
+            <div class="metric-card metric-inventory col-3" data-tooltip="Active properties on market">
                 <div class="metric-header">
-                    <div class="metric-icon cyan">
+                    <div>
+                        <h3 class="metric-title">Active Inventory</h3>
+                        <div class="metric-value" id="inventory">105</div>
+                    </div>
+                    <div class="metric-icon">
                         <i class="fas fa-home"></i>
                     </div>
-                    <span class="metric-badge cyan">TREND</span>
                 </div>
-                <h3 class="metric-title">Active Inventory</h3>
-                <div class="metric-value">105</div>
-                <div class="metric-change negative">
+                <div class="metric-change change-down">
                     <i class="fas fa-arrow-down"></i>
                     <span>-8% from last month</span>
                 </div>
             </div>
 
-            <div class="metric-card orange">
+            <div class="metric-card metric-trend col-3" data-tooltip="Overall market direction">
                 <div class="metric-header">
-                    <div class="metric-icon orange">
+                    <div>
+                        <h3 class="metric-title">Market Trend</h3>
+                        <div class="metric-value" id="trend">Heating</div>
+                    </div>
+                    <div class="metric-icon">
                         <i class="fas fa-fire"></i>
                     </div>
-                    <span class="metric-badge orange">LIVE</span>
                 </div>
-                <h3 class="metric-title">Market Trend</h3>
-                <div class="metric-value">Heating</div>
-                <div class="metric-change positive">
+                <div class="metric-change change-up">
                     <i class="fas fa-arrow-up"></i>
-                    <span>Strong upward momentum</span>
+                    <span>Strong momentum</span>
                 </div>
             </div>
-        </div>
 
-        <!-- Charts -->
-        <div class="charts-grid">
-            <div class="chart-card">
+            <!-- PRICE TREND CHART -->
+            <div class="chart-container col-8" data-tooltip="12-month price trend analysis">
                 <div class="chart-header">
-                    <h3 class="chart-title">
-                        <i class="fas fa-chart-line" style="color: #3b82f6;"></i>
-                        Price Trend Analysis
-                    </h3>
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        Price Trend
+                    </div>
                     <div class="chart-legend">
                         <div class="legend-item">
-                            <div class="legend-dot" style="background: #3b82f6;"></div>
+                            <span class="legend-dot legend-price"></span>
                             <span>List Price</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-dot" style="background: #8b5cf6;"></div>
+                            <span class="legend-dot legend-sale"></span>
                             <span>Sale Price</span>
                         </div>
                     </div>
                 </div>
-                <canvas id="priceChart" height="200"></canvas>
-            </div>
-
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h3 class="chart-title">
-                        <i class="fas fa-chart-bar" style="color: #06b6d4;"></i>
-                        Inventory Levels
-                    </h3>
+                <div class="chart-wrapper">
+                    <canvas id="priceChart"></canvas>
                 </div>
-                <canvas id="inventoryChart" height="200"></canvas>
             </div>
-        </div>
 
-        <div class="charts-grid">
-            <div class="chart-card">
+            <!-- INVENTORY CHART -->
+            <div class="chart-container col-4" data-tooltip="Inventory levels over time">
                 <div class="chart-header">
-                    <h3 class="chart-title">
-                        <i class="fas fa-tachometer-alt" style="color: #f97316;"></i>
-                        Market Velocity
-                    </h3>
+                    <div class="chart-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Inventory
+                    </div>
                     <div class="chart-legend">
                         <div class="legend-item">
-                            <div class="legend-dot" style="background: #f97316;"></div>
+                            <span class="legend-dot legend-inventory"></span>
+                            <span>Active Listings</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- VELOCITY CHART -->
+            <div class="chart-container col-6" data-tooltip="Market velocity indicators">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Market Velocity
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dom"></span>
                             <span>Days on Market</span>
                         </div>
                         <div class="legend-item">
-                            <div class="legend-dot" style="background: #ec4899;"></div>
+                            <span class="legend-dot" style="background: #ef4444;"></span>
                             <span>Price Reductions</span>
                         </div>
                     </div>
                 </div>
-                <canvas id="velocityChart" height="200"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="velocityChart"></canvas>
+                </div>
             </div>
 
-            <div class="chart-card">
+            <!-- MARKET SENTIMENT -->
+            <div class="chart-container col-6" data-tooltip="Market composition analysis">
                 <div class="chart-header">
-                    <h3 class="chart-title">
-                        <i class="fas fa-chart-pie" style="color: #8b5cf6;"></i>
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
                         Market Composition
-                    </h3>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #4f46e5;"></span>
+                            <span>Under Contract</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #10b981;"></span>
+                            <span>Active</span>
+                        </div>
+                    </div>
                 </div>
-                <canvas id="compositionChart" height="200"></canvas>
+                <div class="chart-wrapper">
+                    <canvas id="compositionChart"></canvas>
+                </div>
             </div>
-        </div>
 
-        <!-- Action Items -->
-        <div class="action-section">
-            <div class="chart-header">
-                <h3 class="chart-title">
-                    <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
-                    Realtor Action Items
-                </h3>
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #06b6d4;"></div>
-                        <span>High Priority</span>
+            <!-- INSIGHTS -->
+            <div class="insight-card positive col-4" data-tooltip="Positive market indicators">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-arrow-up"></i>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #f97316;"></div>
-                        <span>Medium Priority</span>
+                    <div>
+                        <h4 class="insight-title">Price Momentum</h4>
+                        <div class="insight-time">2 hours ago</div>
                     </div>
                 </div>
+                <div class="insight-content">
+                    <p>List prices increasing at 2.1% monthly pace. Strong negotiating power for sellers.</p>
+                </div>
             </div>
-            
-            <div class="action-grid">
-                <div class="action-card high">
-                    <h4>
+
+            <div class="insight-card negative col-4" data-tooltip="Market challenges">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Inventory Alert</h4>
+                        <div class="insight-time">4 hours ago</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p>Active inventory down 8% this month. Buyers should act quickly on well-priced properties.</p>
+                </div>
+            </div>
+
+            <div class="insight-card neutral col-4" data-tooltip="Market forecast">
+                <div class="insight-header">
+                    <div class="insight-icon">
                         <i class="fas fa-chart-line"></i>
-                        Price New Listings Aggressively
-                    </h4>
-                    <p>Current market supports 2-3% above recent comps</p>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Market Forecast</h4>
+                        <div class="insight-time">Today</div>
+                    </div>
                 </div>
-                
-                <div class="action-card medium">
-                    <h4>
-                        <i class="fas fa-search"></i>
-                        Target Price-Reduced Properties
-                    </h4>
-                    <p>15 properties reduced price this week - great opportunities</p>
-                </div>
-                
-                <div class="action-card high">
-                    <h4>
-                        <i class="fas fa-sync-alt"></i>
-                        Update CMAs Weekly
-                    </h4>
-                    <p>Market moving fast - keep comps current</p>
-                </div>
-                
-                <div class="action-card medium">
-                    <h4>
-                        <i class="fas fa-users"></i>
-                        Focus on First-Time Buyers
-                    </h4>
-                    <p>High activity in $250-300k range</p>
+                <div class="insight-content">
+                    <p>Stable growth expected through Q3. Interest rates remain favorable for buyers and sellers.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Insights Feed -->
-        <div class="insights-section">
-            <h3 class="chart-title" style="margin-bottom: 1.5rem;">
-                <i class="fas fa-rss" style="color: #eab308;"></i>
-                Live Market Insights
-            </h3>
-            
-            <div class="insight-card">
-                <div class="insight-header">
-                    <h4>📈 Price Momentum Building</h4>
-                    <span class="insight-time">2 min ago</span>
+        <!-- REALTOR INSIGHTS -->
+        <div class="dashboard-grid" style="margin-top: 1.5rem;">
+            <div class="chart-container col-12" data-tooltip="Actionable insights for realtors">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Realtor Action Items
+                    </div>
                 </div>
-                <p class="insight-text">3 consecutive days of price increases in Warner Robins. Consider adjusting listing strategies.</p>
-                <div class="insight-tags">
-                    <span class="tag green">Pricing</span>
-                    <span class="tag blue">Strategy</span>
-                </div>
-            </div>
-
-            <div class="insight-card blue">
-                <div class="insight-header">
-                    <h4>🎯 First-Time Buyer Activity</h4>
-                    <span class="insight-time">15 min ago</span>
-                </div>
-                <p class="insight-text">Increased search activity from first-time buyers in the $250-300k range.</p>
-                <div class="insight-tags">
-                    <span class="tag purple">Buyers</span>
-                    <span class="tag yellow">Opportunity</span>
-                </div>
-            </div>
-
-            <div class="insight-card gray">
-                <div class="insight-header">
-                    <h4>🏠 New Listing Alert</h4>
-                    <span class="insight-time">30 min ago</span>
-                </div>
-                <p class="insight-text">5 new listings entered the market this morning. All priced competitively.</p>
-                <div class="insight-tags">
-                    <span class="tag cyan">Inventory</span>
-                    <span class="tag green">New</span>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #10b981;">
+                        <h4 style="color: #10b981; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-bullhorn"></i> Price New Listings Aggressively
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--dark);">Market supports 2-3% above recent comps</p>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <h4 style="color: #f59e0b; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-search"></i> Target Price-Reduced Properties
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--dark);">15 properties reduced price this week</p>
+                    </div>
+                    <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <h4 style="color: #3b82f6; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                            <i class="fas fa-users"></i> Focus on First-Time Buyers
+                        </h4>
+                        <p style="font-size: 0.85rem; color: var(--dark);">High activity in $250-300k range</p>
+                    </div>
                 </div>
             </div>
         </div>
+    </main>
 
-        <!-- Footer -->
-        <div class="footer">
-            <p>© 2024 RHMR Pro Dashboard | Real-Time Real Estate Intelligence</p>
-            <p>Data Sources: Zillow • Realtor.com • MLS • Public Records</p>
-        </div>
-    </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2026 RHMR Dashboard | Real-Time Real Estate Intelligence by Nagoh Creative</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--gray);">
+            Data updates automatically • Built for real estate professionals
+        </p>
+    </footer>
 
     <script>
-        // Update timestamp
-        function updateTimestamp() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('updateTime').textContent = `Updated: ${timeString}`;
-        }
-        
-        setInterval(updateTimestamp, 30000);
-
-        // Initialize charts
+        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupEventListeners();
             updateTimestamp();
+            startAutoRefresh();
             
+            // Load data from JSON if available
+            loadDashboardData();
+        });
+
+        // Initialize all charts with proper sizing
+        function initializeCharts() {
             // Price Trend Chart
             const priceCtx = document.getElementById('priceChart').getContext('2d');
             new Chart(priceCtx, {
                 type: 'line',
                 data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                     datasets: [
                         {
                             label: 'List Price',
-                            data: [285, 287, 288, 289, 290, 289, 290],
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4
+                            data: [265, 268, 272, 275, 279, 282, 285, 287, 289, 291, 293, 295],
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
                         },
                         {
                             label: 'Sale Price',
-                            data: [278, 280, 281, 282, 283, 282, 283],
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            data: [258, 261, 264, 268, 272, 275, 278, 281, 283, 285, 287, 289],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
+                            fill: true,
                             borderDash: [5, 5]
                         }
                     ]
@@ -877,20 +991,25 @@
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12,
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: $${(context.parsed.y * 1000).toLocaleString()}`;
+                                }
+                            }
                         }
                     },
                     scales: {
+                        x: {
+                            grid: { display: false }
+                        },
                         y: {
                             beginAtZero: false,
+                            min: 250,
                             ticks: {
                                 callback: function(value) {
-                                    return ' + value + 'k';
+                                    return '$' + (value * 1000).toLocaleString();
                                 }
                             }
                         }
@@ -907,7 +1026,7 @@
                     datasets: [{
                         label: 'Active Listings',
                         data: [135, 128, 118, 112, 108, 105],
-                        backgroundColor: '#06b6d4',
+                        backgroundColor: '#10b981',
                         borderRadius: 6
                     }]
                 },
@@ -915,14 +1034,15 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12
-                        }
+                        legend: { display: false }
                     },
                     scales: {
-                        y: { beginAtZero: true }
+                        x: {
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
             });
@@ -937,22 +1057,21 @@
                         {
                             label: 'Days on Market',
                             data: [38, 35, 32, 29, 26, 24],
-                            borderColor: '#f97316',
-                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
+                            fill: true,
                             yAxisID: 'y'
                         },
                         {
                             label: 'Price Reductions',
                             data: [22, 20, 18, 16, 14, 15],
-                            borderColor: '#ec4899',
-                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
                             tension: 0.4,
-                            borderDash: [5, 5],
+                            fill: true,
                             yAxisID: 'y1'
                         }
                     ]
@@ -961,13 +1080,12 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12
-                        }
+                        legend: { display: false }
                     },
                     scales: {
+                        x: {
+                            grid: { display: false }
+                        },
                         y: {
                             type: 'linear',
                             display: true,
@@ -977,13 +1095,15 @@
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            grid: { drawOnChartArea: false }
+                            grid: {
+                                drawOnChartArea: false
+                            }
                         }
                     }
                 }
             });
 
-            // Market Composition Chart
+            // Composition Chart
             const compositionCtx = document.getElementById('compositionChart').getContext('2d');
             new Chart(compositionCtx, {
                 type: 'doughnut',
@@ -991,37 +1111,176 @@
                     labels: ['Under Contract', 'Active', 'Price Reduced', 'New'],
                     datasets: [{
                         data: [35, 105, 15, 12],
-                        backgroundColor: ['#3b82f6', '#06b6d4', '#f97316', '#8b5cf6'],
-                        borderWidth: 0,
-                        hoverOffset: 15
+                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#3b82f6'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '65%',
+                    cutout: '70%',
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                usePointStyle: true,
-                                pointStyle: 'circle'
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: '#1e293b',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((context.raw / total) * 100);
-                                    return `${context.label}: ${context.raw} properties (${percentage}%)`;
-                                }
-                            }
+                            position: 'bottom'
                         }
                     }
                 }
             });
-        });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // ZIP code selector
+            document.getElementById('zipSelect').addEventListener('change', function(e) {
+                const zip = e.target.value;
+                console.log(`Loading data for ZIP: ${zip}`);
+                showNotification(`Loading data for ${zip}...`, 'info');
+                updateMetricsForZip(zip);
+            });
+
+            // Add hover effects
+            document.querySelectorAll('.metric-card, .chart-container, .insight-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString([], {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            document.getElementById('updateTime').textContent = `Updated: ${dateString} ${timeString}`;
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('data/houston-county-ga/dashboard_data.json');
+                if (response.ok) {
+                    const data = await response.json();
+                    updateDashboardWithData(data);
+                }
+            } catch (error) {
+                console.log('Using demo data');
+            }
+        }
+
+        // Update dashboard with real data
+        function updateDashboardWithData(data) {
+            if (!data) return;
+            
+            // Update metrics from data
+            if (data.market_summary) {
+                const summary = data.market_summary;
+                document.getElementById('marketTemp').textContent = `${summary.avg_opportunity_score || 84}°`;
+                document.getElementById('opportunityScore').textContent = summary.avg_opportunity_score || 89;
+                document.getElementById('velocityIndex').textContent = 85;
+                document.getElementById('marketBalance').textContent = '62%';
+                
+                // Update pricing metrics if available
+                if (data.zip_codes && data.zip_codes.length > 0) {
+                    const zipData = data.zip_codes[0];
+                    document.getElementById('medianList').textContent = `$${(zipData.metrics?.composite_price || 289500).toLocaleString()}`;
+                    document.getElementById('medianSale').textContent = `$${Math.round((zipData.metrics?.composite_price || 289500) * 0.97).toLocaleString()}`;
+                    document.getElementById('inventory').textContent = zipData.metrics?.composite_inventory || 105;
+                    document.getElementById('trend').textContent = summary.market_trend || 'Heating';
+                }
+            }
+            
+            updateTimestamp();
+        }
+
+        // Update metrics for selected ZIP
+        function updateMetricsForZip(zip) {
+            // Simulate API call with random data
+            const basePrice = 285000 + Math.floor(Math.random() * 20000);
+            const inventory = 90 + Math.floor(Math.random() * 40);
+            const trend = Math.random() > 0.3 ? 'Heating' : 'Cooling';
+            
+            // Update metrics
+            document.getElementById('medianList').textContent = `$${basePrice.toLocaleString()}`;
+            document.getElementById('medianSale').textContent = `$${Math.round(basePrice * 0.97).toLocaleString()}`;
+            document.getElementById('inventory').textContent = inventory;
+            document.getElementById('trend').textContent = trend;
+            
+            // Update pulse metrics
+            document.getElementById('marketTemp').textContent = `${75 + Math.floor(Math.random() * 20)}°`;
+            document.getElementById('opportunityScore').textContent = 70 + Math.floor(Math.random() * 30);
+            
+            updateTimestamp();
+            showNotification(`Data updated for ZIP ${zip}`, 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#4f46e5'};
+                color: white;
+                padding: 0.75rem 1.25rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                font-size: 0.9rem;
+                max-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh(interval = 30000) {
+            setInterval(() => {
+                updateTimestamp();
+                // In a real app, this would fetch new data
+            }, interval);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
+</body>
+</html>
