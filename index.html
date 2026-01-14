@@ -1,320 +1,480 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RHMR Pro • Real-Time Real Estate Dashboard</title>
+import React, { useState, useEffect } from 'react';
+import { Home, TrendingUp, Clock, DollarSign, Activity, AlertCircle, BarChart3, MapPin, RefreshCw, Star, ThermometerSun, Zap, Scale } from 'lucide-react';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, PieChart, Pie, Cell } from 'recharts';
 
-  <!-- Google Fonts: Inter (clean & professional) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+const RealEstateDashboard = () => {
+  const [selectedZip, setSelectedZip] = useState('31088');
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  
+  // Auto-update timestamp
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLastUpdate(new Date());
+    }, 30000); // Update every 30 seconds
+    return () => clearInterval(timer);
+  }, []);
+  
+  // Sample data for charts
+  const priceData = [
+    { day: 'Mon', price: 285, inventory: 98 },
+    { day: 'Tue', price: 287, inventory: 102 },
+    { day: 'Wed', price: 288, inventory: 105 },
+    { day: 'Thu', price: 289, inventory: 108 },
+    { day: 'Fri', price: 290, inventory: 105 },
+    { day: 'Sat', price: 289, inventory: 103 },
+    { day: 'Sun', price: 290, inventory: 105 }
+  ];
+  
+  const activityData = [
+    { name: 'New', value: 12 },
+    { name: 'Pending', value: 8 },
+    { name: 'Sold', value: 15 },
+    { name: 'Reduced', value: 5 }
+  ];
 
-  <!-- Font Awesome 6 -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  const velocityData = [
+    { month: 'Jan', dom: 38, reductions: 22 },
+    { month: 'Feb', dom: 35, reductions: 20 },
+    { month: 'Mar', dom: 32, reductions: 18 },
+    { month: 'Apr', dom: 29, reductions: 16 },
+    { month: 'May', dom: 26, reductions: 14 },
+    { month: 'Jun', dom: 24, reductions: 15 }
+  ];
 
-  <!-- Chart.js + annotation plugin -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  const marketComposition = [
+    { name: 'Under Contract', value: 35, color: '#4361ee' },
+    { name: 'Active', value: 105, color: '#4cc9f0' },
+    { name: 'Price Reduced', value: 15, color: '#f8961e' },
+    { name: 'New', value: 12, color: '#7209b7' }
+  ];
 
-  <!-- Toastify (for future notifications) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  const inventoryData = [
+    { month: 'Jan', count: 135 },
+    { month: 'Feb', count: 128 },
+    { month: 'Mar', count: 118 },
+    { month: 'Apr', count: 112 },
+    { month: 'May', count: 108 },
+    { month: 'Jun', count: 105 }
+  ];
 
-  <style>
-    :root {
-      --primary: #1e40af;
-      --primary-dark: #1e3a8a;
-      --primary-light: #3b82f6;
-      --accent: #10b981;
-      --accent-light: #34d399;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --neutral-50: #f8fafc;
-      --neutral-100: #f1f5f9;
-      --neutral-200: #e2e8f0;
-      --neutral-300: #cbd5e1;
-      --neutral-600: #475569;
-      --neutral-700: #334155;
-      --neutral-800: #1e293b;
-      --neutral-900: #0f172a;
-    }
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  };
 
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: var(--neutral-50);
-      color: var(--neutral-800);
-      line-height: 1.6;
-    }
-
-    .container { max-width: 1440px; margin: 0 auto; padding: 0 1.25rem; }
-
-    header {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-      color: white;
-      padding: 1.75rem 0;
-      box-shadow: 0 6px 16px -4px rgba(0,0,0,0.2);
-    }
-
-    h1, h2, h3 { font-weight: 700; letter-spacing: -0.025em; }
-
-    .card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.07), 0 8px 10px -6px rgba(0,0,0,0.03);
-      overflow: hidden;
-      transition: all 0.25s ease;
-    }
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.12);
-    }
-
-    .badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.8125rem;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .badge-live   { background: #dcfce7; color: #166534; }
-    .badge-trend  { background: #fef3c7; color: #92400e; }
-    .badge-hot    { background: #fee2e2; color: #991b1b; }
-
-    .metric-value {
-      font-size: 2.75rem;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--primary);
-    }
-
-    .positive { color: var(--accent); }
-    .negative { color: var(--danger); }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem 1.25rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      border: none;
-    }
-    .btn-primary:hover { background: var(--primary-dark); }
-
-    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.75rem; }
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 2rem; }
-
-    .section-title {
-      font-size: 1.75rem;
-      margin-bottom: 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .pulse-dot {
-      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%      { opacity: 0.35; }
-    }
-
-    footer {
-      background: var(--neutral-900);
-      color: var(--neutral-300);
-      padding: 4rem 0 2rem;
-      margin-top: 6rem;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Live Bar -->
-  <div style="background: linear-gradient(to right, var(--primary-dark), var(--primary)); color:white; padding:0.75rem 0; font-size:0.95rem;">
-    <div class="container flex flex-wrap justify-between items-center gap-4">
-      <div class="flex items-center gap-3 font-semibold">
-        <span class="relative flex h-3 w-3">
-          <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-white opacity-70"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
-        </span>
-        LIVE
-      </div>
-      <div class="flex items-center gap-6 opacity-90">
-        <span><i class="fas fa-sync-alt mr-1.5 text-xs"></i>Updates every 10 min • <span id="last-update">just now</span></span>
-        <span><i class="fas fa-bullhorn mr-1.5 text-xs"></i>Market: <strong>Active</strong></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Header -->
-  <header>
-    <div class="container">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 class="text-3xl md:text-4xl flex items-center gap-3">
-            <i class="fas fa-chart-line text-accent-light text-4xl"></i>
-            RHMR Pro
-            <span class="text-lg font-semibold bg-white/20 px-3 py-1 rounded-full">v3.0</span>
-          </h1>
-          <p class="mt-1.5 text-lg opacity-90">Real-Time Market Intelligence – Houston County, GA</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-4">
-          <!-- Time range -->
-          <div class="flex bg-white/15 rounded-xl p-1.5 gap-1.5">
-            <button class="btn bg-white text-primary shadow-sm active:scale-95"><i class="fas fa-bolt"></i> Live</button>
-            <button class="btn text-white hover:bg-white/20"><i class="fas fa-history"></i> 24h</button>
-            <button class="btn text-white hover:bg-white/20"><i class="fas fa-calendar-week"></i> 7d</button>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-slate-100 text-slate-900 p-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 mb-6 shadow-2xl border border-slate-700">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-3 rounded-xl shadow-lg">
+              <Home className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                RHMR Pro Dashboard
+              </h1>
+              <p className="text-slate-400 text-sm">Real-Time Real Estate Intelligence Platform</p>
+            </div>
           </div>
-
-          <!-- ZIP selector -->
-          <div class="flex items-center gap-3 bg-white/15 px-4 py-2 rounded-xl">
-            <i class="fas fa-map-marker-alt"></i>
-            <select multiple class="bg-transparent border-none text-white focus:ring-0 min-w-[220px]">
-              <option value="31088" selected>31088 – Warner Robins</option>
-              <option value="31093">31093 – Centerville</option>
-              <option value="31098">31098 – Bonaire</option>
-              <option value="31005">31005 – Byron</option>
+          
+          <div className="flex gap-3 items-center flex-wrap">
+            <select 
+              value={selectedZip}
+              onChange={(e) => setSelectedZip(e.target.value)}
+              className="bg-slate-800/50 border border-slate-600 rounded-xl px-4 py-2.5 text-white backdrop-blur-sm font-medium"
+            >
+              <option value="31088">📍 31088 - Warner Robins</option>
+              <option value="31093">📍 31093 - Centerville</option>
+              <option value="31098">📍 31098 - Bonaire</option>
             </select>
-            <button class="btn btn-primary text-sm"><i class="fas fa-chart-bar"></i> Compare</button>
+            
+            <div className="flex items-center gap-2 bg-slate-800/50 px-4 py-2.5 rounded-xl backdrop-blur-sm border border-slate-600">
+              <RefreshCw className="w-4 h-4 text-cyan-400 animate-spin" style={{animationDuration: '3s'}} />
+              <span className="text-slate-300 text-sm">Updated: {formatTime(lastUpdate)}</span>
+            </div>
           </div>
         </div>
+        
+        {/* Live indicator */}
+        <div className="flex items-center gap-4 mt-4">
+          <div className="flex items-center gap-2 bg-red-500/20 px-4 py-2 rounded-full border border-red-500/50">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <span className="text-red-400 font-semibold text-sm">LIVE</span>
+          </div>
+          <span className="text-slate-400 text-sm">Auto-updating every 30 seconds</span>
+        </div>
+      </div>
+
+      {/* Market Pulse Banner */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 rounded-2xl p-8 mb-6 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+              <Activity className="w-8 h-8 text-yellow-300" />
+              Market Pulse
+            </h2>
+            <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
+              <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+              <span className="text-white font-semibold">LIVE</span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 hover:bg-white/15 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <ThermometerSun className="w-5 h-5 text-orange-300" />
+                <h4 className="text-white/90 text-sm uppercase tracking-wide">Market Temperature</h4>
+              </div>
+              <div className="text-4xl font-bold text-white mb-2">82°</div>
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <TrendingUp className="w-4 h-4 text-cyan-300" />
+                <span>Heating up (+4° this week)</span>
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 hover:bg-white/15 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="w-5 h-5 text-yellow-300" />
+                <h4 className="text-white/90 text-sm uppercase tracking-wide">Velocity Score</h4>
+              </div>
+              <div className="text-4xl font-bold text-white mb-2">87</div>
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <Zap className="w-4 h-4 text-yellow-300" />
+                <span>Fast-moving market</span>
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 hover:bg-white/15 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <Scale className="w-5 h-5 text-orange-300" />
+                <h4 className="text-white/90 text-sm uppercase tracking-wide">Buyer/Seller Index</h4>
+              </div>
+              <div className="text-4xl font-bold text-white mb-2">68</div>
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <Scale className="w-4 h-4 text-orange-300" />
+                <span>Seller's market</span>
+              </div>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/20 hover:bg-white/15 transition-all">
+              <div className="flex items-center gap-2 mb-2">
+                <Star className="w-5 h-5 text-yellow-300" />
+                <h4 className="text-white/90 text-sm uppercase tracking-wide">Opportunity Score</h4>
+              </div>
+              <div className="text-4xl font-bold text-white mb-2">92</div>
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <Star className="w-4 h-4 text-yellow-300" />
+                <span>Excellent for new agents</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white rounded-xl p-6 shadow-lg border-t-4 border-blue-500 hover:shadow-xl transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <DollarSign className="w-8 h-8 text-blue-500" />
+            <span className="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-semibold">LIVE</span>
+          </div>
+          <h3 className="text-slate-500 text-sm mb-2 uppercase tracking-wide font-medium">Median List Price</h3>
+          <div className="text-4xl font-bold text-slate-900 mb-3">$289,500</div>
+          <div className="flex items-center gap-2 text-green-600 text-sm font-semibold">
+            <TrendingUp className="w-4 h-4" />
+            <span>+2.1% this month</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg border-t-4 border-purple-500 hover:shadow-xl transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <DollarSign className="w-8 h-8 text-purple-500" />
+            <span className="text-xs bg-purple-100 text-purple-600 px-3 py-1 rounded-full font-semibold">24H</span>
+          </div>
+          <h3 className="text-slate-500 text-sm mb-2 uppercase tracking-wide font-medium">Median Sale Price</h3>
+          <div className="text-4xl font-bold text-slate-900 mb-3">$281,200</div>
+          <div className="flex items-center gap-2 text-green-600 text-sm font-semibold">
+            <TrendingUp className="w-4 h-4" />
+            <span>+1.8% this month</span>
+          </div>
+          <div className="text-xs text-slate-400 mt-2">24 days avg</div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg border-t-4 border-cyan-500 hover:shadow-xl transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <Home className="w-8 h-8 text-cyan-500" />
+            <span className="text-xs bg-cyan-100 text-cyan-600 px-3 py-1 rounded-full font-semibold">TREND</span>
+          </div>
+          <h3 className="text-slate-500 text-sm mb-2 uppercase tracking-wide font-medium">Active Inventory</h3>
+          <div className="text-4xl font-bold text-slate-900 mb-3">105</div>
+          <div className="flex items-center gap-2 text-red-600 text-sm font-semibold">
+            <TrendingUp className="w-4 h-4 rotate-180" />
+            <span>-8% from last month</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg border-t-4 border-orange-500 hover:shadow-xl transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <ThermometerSun className="w-8 h-8 text-orange-500" />
+            <span className="text-xs bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-semibold">LIVE</span>
+          </div>
+          <h3 className="text-slate-500 text-sm mb-2 uppercase tracking-wide font-medium">Market Trend</h3>
+          <div className="text-4xl font-bold text-slate-900 mb-3">Heating</div>
+          <div className="flex items-center gap-2 text-green-600 text-sm font-semibold">
+            <TrendingUp className="w-4 h-4" />
+            <span>Strong upward momentum</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-blue-500" />
+            Price Trend Analysis
+            <div className="ml-auto flex gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                <span className="text-slate-600">List Price</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                <span className="text-slate-600">Sale Price</span>
+              </div>
+            </div>
+          </h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <AreaChart data={priceData}>
+              <defs>
+                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorSale" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="day" stroke="#64748b" style={{fontSize: '12px'}} />
+              <YAxis stroke="#64748b" style={{fontSize: '12px'}} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: 'none', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
+              />
+              <Area type="monotone" dataKey="price" stroke="#3b82f6" fill="url(#colorPrice)" strokeWidth={3} />
+              <Line type="monotone" dataKey="inventory" stroke="#a855f7" strokeWidth={2} strokeDasharray="5 5" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <Activity className="w-6 h-6 text-cyan-500" />
+            Inventory Levels
+          </h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={inventoryData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" stroke="#64748b" style={{fontSize: '12px'}} />
+              <YAxis stroke="#64748b" style={{fontSize: '12px'}} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: 'none', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
+              />
+              <Bar dataKey="count" fill="#06b6d4" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <Clock className="w-6 h-6 text-orange-500" />
+            Market Velocity
+            <div className="ml-auto flex gap-3 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                <span className="text-slate-600">Days on Market</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-pink-500"></div>
+                <span className="text-slate-600">Price Reductions</span>
+              </div>
+            </div>
+          </h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart data={velocityData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="month" stroke="#64748b" style={{fontSize: '12px'}} />
+              <YAxis stroke="#64748b" style={{fontSize: '12px'}} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: 'none', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
+              />
+              <Line type="monotone" dataKey="dom" stroke="#f97316" strokeWidth={3} />
+              <Line type="monotone" dataKey="reductions" stroke="#ec4899" strokeWidth={3} strokeDasharray="5 5" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 shadow-lg">
+          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-purple-500" />
+            Market Composition
+          </h3>
+          <ResponsiveContainer width="100%" height={280}>
+            <PieChart>
+              <Pie
+                data={marketComposition}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {marketComposition.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: 'none', 
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            {marketComposition.map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{backgroundColor: item.color}}></div>
+                <span className="text-sm text-slate-600">{item.name}: {item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Realtor Action Items */}
+      <div className="bg-white rounded-xl p-6 shadow-lg mb-6">
+        <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <AlertCircle className="w-6 h-6 text-orange-500" />
+          Realtor Action Items
+          <div className="ml-auto flex gap-3 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-cyan-500"></div>
+              <span className="text-slate-600">High Priority</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+              <span className="text-slate-600">Medium Priority</span>
+            </div>
+          </div>
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-5 rounded-xl border-l-4 border-cyan-500">
+            <h4 className="text-cyan-700 font-bold mb-2 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" />
+              Price New Listings Aggressively
+            </h4>
+            <p className="text-sm text-slate-700">Current market supports 2-3% above recent comps</p>
+          </div>
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border-l-4 border-orange-500">
+            <h4 className="text-orange-700 font-bold mb-2 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              Target Price-Reduced Properties
+            </h4>
+            <p className="text-sm text-slate-700">15 properties reduced price this week - great opportunities</p>
+          </div>
+          <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 p-5 rounded-xl border-l-4 border-cyan-500">
+            <h4 className="text-cyan-700 font-bold mb-2 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              Update CMAs Weekly
+            </h4>
+            <p className="text-sm text-slate-700">Market moving fast - keep comps current</p>
+          </div>
+          <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-xl border-l-4 border-orange-500">
+            <h4 className="text-orange-700 font-bold mb-2 flex items-center gap-2">
+              <Home className="w-5 h-5" />
+              Focus on First-Time Buyers
+            </h4>
+            <p className="text-sm text-slate-700">High activity in $250-300k range</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Insights Feed */}
+      <div className="bg-white rounded-xl p-6 shadow-lg">
+        <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <Activity className="w-6 h-6 text-yellow-500" />
+          Live Market Insights
+        </h3>
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-5 border-l-4 border-green-500">
+            <div className="flex items-start justify-between mb-3">
+              <h4 className="font-bold text-green-700 text-lg">📈 Price Momentum Building</h4>
+              <span className="text-xs text-slate-500">2 min ago</span>
+            </div>
+            <p className="text-slate-700 mb-3">3 consecutive days of price increases in Warner Robins. Consider adjusting listing strategies.</p>
+            <div className="flex gap-2">
+              <span className="text-xs bg-green-200 text-green-700 px-3 py-1 rounded-full font-medium">Pricing</span>
+              <span className="text-xs bg-blue-200 text-blue-700 px-3 py-1 rounded-full font-medium">Strategy</span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-5 border-l-4 border-blue-500">
+            <div className="flex items-start justify-between mb-3">
+              <h4 className="font-bold text-blue-700 text-lg">🎯 First-Time Buyer Activity</h4>
+              <span className="text-xs text-slate-500">15 min ago</span>
+            </div>
+            <p className="text-slate-700 mb-3">Increased search activity from first-time buyers in the $250-300k range.</p>
+            <div className="flex gap-2">
+              <span className="text-xs bg-purple-200 text-purple-700 px-3 py-1 rounded-full font-medium">Buyers</span>
+              <span className="text-xs bg-yellow-200 text-yellow-700 px-3 py-1 rounded-full font-medium">Opportunity</span>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-5 border-l-4 border-slate-500">
+            <div className="flex items-start justify-between mb-3">
+              <h4 className="font-bold text-slate-700 text-lg">🏠 New Listing Alert</h4>
+              <span className="text-xs text-slate-500">30 min ago</span>
+            </div>
+            <p className="text-slate-700 mb-3">5 new listings entered the market this morning. All priced competitively.</p>
+            <div className="flex gap-2">
+              <span className="text-xs bg-cyan-200 text-cyan-700 px-3 py-1 rounded-full font-medium">Inventory</span>
+              <span className="text-xs bg-green-200 text-green-700 px-3 py-1 rounded-full font-medium">New</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 text-center text-slate-500 text-sm">
+        <p>© 2024 RHMR Pro Dashboard | Real-Time Real Estate Intelligence</p>
+        <p className="mt-2">Data Sources: Zillow • Realtor.com • MLS • Public Records</p>
       </div>
     </div>
-  </header>
+  );
+};
 
-  <main class="container py-10 space-y-14">
-
-    <!-- Market Pulse -->
-    <section>
-      <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
-        <h2 class="section-title"><i class="fas fa-heartbeat text-accent text-3xl"></i> Market Pulse</h2>
-        <button class="btn bg-white border border-neutral-200 hover:bg-neutral-50 shadow-sm">
-          <i class="fas fa-redo"></i> Refresh Now
-        </button>
-      </div>
-
-      <div class="grid-4">
-        <div class="card p-6 border-t-4 border-orange-500">
-          <div class="flex items-start gap-5">
-            <div class="text-5xl text-orange-500 opacity-90"><i class="fas fa-fire"></i></div>
-            <div>
-              <h3 class="text-xl font-semibold text-neutral-700 mb-1">Market Temperature</h3>
-              <div class="metric-value" id="mkt-temp">74°</div>
-              <div class="mt-2 text-base positive font-medium"><i class="fas fa-arrow-up"></i> +4° since yesterday</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card p-6 border-t-4 border-emerald-500">
-          <div class="flex items-start gap-5">
-            <div class="text-5xl text-emerald-500 opacity-90"><i class="fas fa-bolt"></i></div>
-            <div class="flex-1">
-              <h3 class="text-xl font-semibold text-neutral-700 mb-1">Velocity Score</h3>
-              <div class="metric-value" id="velocity">88</div>
-              <div class="mt-4 h-3 bg-neutral-200 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500 rounded-full transition-all" style="width:88%"></div>
-              </div>
-              <div class="mt-2 text-sm font-medium text-emerald-700">Very fast-moving market</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card p-6 border-t-4 border-blue-500">
-          <div class="flex items-start gap-5">
-            <div class="text-5xl text-blue-500 opacity-90"><i class="fas fa-balance-scale"></i></div>
-            <div class="flex-1">
-              <h3 class="text-xl font-semibold text-neutral-700 mb-1">Leverage Index</h3>
-              <div class="metric-value" id="leverage">62</div>
-              <div class="mt-5 relative h-4 bg-gradient-to-r from-blue-200 via-neutral-200 to-red-200 rounded-full">
-                <div class="absolute -top-2.5 left-[62%] w-7 h-7 bg-blue-600 rounded-full border-4 border-white shadow-lg transform -translate-x-1/2"></div>
-              </div>
-              <div class="flex justify-between text-sm font-medium mt-2">
-                <span class="text-blue-700">Buyer’s market</span>
-                <span class="text-red-700">Seller’s market</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card p-6 border-t-4 border-amber-500">
-          <div class="flex items-start gap-5">
-            <div class="text-5xl text-amber-500 opacity-90"><i class="fas fa-star"></i></div>
-            <div>
-              <h3 class="text-xl font-semibold text-neutral-700 mb-1">Opportunity Score</h3>
-              <div class="metric-value" id="opp-score">81</div>
-              <div class="mt-3 flex text-amber-500 text-2xl gap-1">
-                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-              </div>
-              <div class="mt-2 text-sm font-medium text-amber-700">Excellent entry point</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Placeholder for more sections – add your real-time metrics, charts, workflow, insights, etc. here -->
-    <!-- Example stub for metrics row -->
-    <section>
-      <h2 class="section-title"><i class="fas fa-tachometer-alt text-primary text-3xl"></i> Key Metrics</h2>
-      <div class="grid-4">
-        <div class="card p-6">
-          <h3 class="font-semibold text-lg mb-3 flex items-center gap-2"><i class="fas fa-home text-primary"></i> Active Listings</h3>
-          <div class="metric-value">112</div>
-          <div class="mt-2 text-base positive"><i class="fas fa-arrow-up"></i> +7 today</div>
-          <div class="mt-4 h-20 bg-neutral-50 rounded-lg flex items-center justify-center text-neutral-400 italic">Mini sparkline chart here</div>
-        </div>
-        <!-- Add 3 more similar cards... -->
-      </div>
-    </section>
-
-    <!-- You can continue adding sections: charts, insights feed, workflow assistant, confidence booster, etc. -->
-
-  </main>
-
-  <footer>
-    <div class="container grid md:grid-cols-2 gap-12">
-      <div>
-        <h4 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fas fa-database"></i> Data Sources</h4>
-        <p class="opacity-80">MLS • Zillow • Realtor.com • Public Records • Local Analysis</p>
-        <div class="mt-4 text-sm opacity-70">
-          <span class="text-emerald-400 mr-2">●</span> All feeds live • refreshed every 10 minutes
-        </div>
-      </div>
-      <div>
-        <h4 class="text-lg font-semibold mb-4 flex items-center gap-2"><i class="fas fa-mobile-screen"></i> Mobile Optimized</h4>
-        <p class="opacity-80">Perfect for showings, client meetings, and on-the-go decisions.</p>
-      </div>
-    </div>
-    <div class="text-center mt-12 pt-8 border-t border-neutral-700 text-sm opacity-70">
-      © <span id="year">2026</span> RHMR Pro – Empowering Georgia Realtors with Real-Time Data
-    </div>
-  </footer>
-
-  <script>
-    // Quick helpers
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Fake last update timer (demo)
-    setInterval(() => {
-      const now = new Date();
-      const min = now.getMinutes();
-      document.getElementById('last-update').textContent = `at ${now.getHours()}:${min<10?'0':''}${min}`;
-    }, 60000);
-
-    // You can initialize Chart.js canvases here when you add them
-    // Example: new Chart(document.getElementById('myChart'), { ... });
-  </script>
-</body>
-</html>
+export default RealEstateDashboard;
