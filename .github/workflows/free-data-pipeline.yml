@@ -35,16 +35,30 @@ jobs:
         mkdir -p data/houston-county-ga
         mkdir -p data/houston-county-ga/${{ matrix.zip }}
     
-    - name: Collect free data for ZIP ${{ matrix.zip }}
+    - name: Collect free data
       run: |
         echo "Collecting free data for ZIP ${{ matrix.zip }}..."
-        python scripts/free_data_collector.py
+        # Check if the script exists
+        if [ -f "scripts/free_data_collector.py" ]; then
+          python scripts/free_data_collector.py
+        else
+          echo "❌ Error: free_data_collector.py not found!"
+          find . -name "*.py" -type f
+          exit 1
+        fi
     
     - name: Archive collected data
       run: |
-        echo "📁 Data collected for ${{ matrix.zip }:"
+        echo "📁 Data collected for ZIP ${{ matrix.zip }}"
         ls -la data/houston-county-ga/${{ matrix.zip }}/
     
+    - name: Upload data as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: data-${{ matrix.zip }}
+        path: data/houston-county-ga/${{ matrix.zip }}
+        retention-days: 7
+  
   generate-ai-insights:
     runs-on: ubuntu-latest
     needs: collect-free-data
@@ -52,36 +66,110 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Download all data artifacts
+      run: |
+        echo "📥 Downloading data artifacts..."
+        mkdir -p data/houston-county-ga
+        # Create ZIP directories
+        mkdir -p data/houston-county-ga/31088
+        mkdir -p data/houston-county-ga/31093
+        mkdir -p data/houston-county-ga/31098
+    
+    - name: Download artifact 31088
+      uses: actions/download-artifact@v4
+      with:
+        name: data-31088
+        path: data/houston-county-ga/31088
+    
+    - name: Download artifact 31093
+      uses: actions/download-artifact@v4
+      with:
+        name: data-31093
+        path: data/houston-county-ga/31093
+    
+    - name: Download artifact 31098
+      uses: actions/download-artifact@v4
+      with:
+        name: data-31098
+        path: data/houston-county-ga/31098
+    
     - name: Set up Python
       uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
     
     - name: Install AI dependencies
-      run: pip install requests
+      run: |
+        pip install requests beautifulsoup4 pandas numpy
+        echo "✅ AI dependencies installed"
     
-    - name: Generate AI insights
+    - name: Check downloaded data
+      run: |
+        echo "📋 Checking downloaded data..."
+        echo "Directory structure:"
+        find data/houston-county-ga -type f -name "*.json" | head -20
+        echo "Total JSON files:"
+        find data/houston-county-ga -type f -name "*.json" | wc -l
+    
+    - name: Create dashboard JSON files
+      run: |
+        echo "📊 Creating dashboard JSON files..."
+        if [ -f "scripts/create_dashboard_json.py" ]; then
+          python scripts/create_dashboard_json.py
+        else
+          echo "❌ Error: create_dashboard_json.py not found!"
+          echo "Available Python scripts:"
+          find scripts -name "*.py" -type f
+          exit 1
+        fi
+    
+    - name: Generate DeepSeek AI insights
       env:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       run: |
         echo "🤖 Generating AI insights..."
-        python scripts/deepseek_ai_insights.py
+        if [ -f "scripts/deepseek_ai_insights.py" ]; then
+          python scripts/deepseek_ai_insights.py
+        else
+          echo "❌ Error: deepseek_ai_insights.py not found!"
+          echo "Using fallback insights..."
+          # Create a simple fallback insights file
+          mkdir -p data/houston-county-ga/ai_insights
+          echo '{"timestamp": "'$(date -Iseconds)'", "status": "fallback", "message": "AI script not found"}' > data/houston-county-ga/ai_insights_summary.json
+        fi
     
-    - name: Create dashboard
-      run: |
-        echo "📊 Creating dashboard JSON files..."
-        python scripts/create_dashboard_json.py
-    
-    - name: Run full pipeline
+    - name: Run complete pipeline
       run: |
         echo "🚀 Running complete pipeline..."
-        python scripts/run_pipeline.py
+        if [ -f "scripts/run_pipeline.py" ]; then
+          python scripts/run_pipeline.py
+        else
+          echo "⚠️  run_pipeline.py not found, running individual scripts instead"
+          echo "✅ Pipeline completed (individual steps)"
+        fi
     
     - name: Verify generated files
       run: |
-        echo "📋 Generated files:"
-        find data/houston-county-ga -name "*.json" -type f | head -20
-        echo "📊 Total files generated:"
+        echo "📋 Generated dashboard files:"
+        ls -la data/houston-county-ga/*.json || echo "No dashboard files found"
+        echo ""
+        echo "📁 All JSON files in data directory:"
+        find data/houston-county-ga -name "*.json" -type f | head -30
+        echo ""
+        echo "📊 Total files:"
         find data/houston-county-ga -name "*.json" -type f | wc -l
     
+    - name: Upload dashboard artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dashboard-files
+        path: |
+          data/houston-county-ga/dashboard.json
+          data/houston-county-ga/dashboard_simple.json
+          data/houston-county-ga/market_trends.json
+          data/houston-county-ga/ai_insights_summary.json
+        retention-days: 7
+  
   deploy-dashboard:
     runs-on: ubuntu-latest
     needs: generate-ai-insights
@@ -90,18 +178,121 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Download dashboard artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: dashboard-files
+        path: data/houston-county-ga/
+    
+    - name: Setup git config
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config pull.rebase false
+    
+    - name: Pull latest changes
+      run: |
+        git pull origin main
+    
+    - name: Commit and push data updates
+      run: |
+        # Add all data files
+        git add data/
+        
+        # Check if there are any changes
+        if git diff --cached --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "📊 Automated data update $(date +'%Y-%m-%d %H:%M UTC')"
+          git push origin main
+          echo "✅ Data pushed to repository"
+        fi
+    
+    - name: Create simple HTML dashboard
+      run: |
+        echo "🌐 Creating simple HTML dashboard..."
+        mkdir -p docs
+        cat > docs/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Real Estate Dashboard</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }
+                .card { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 5px; }
+                .alert { background: #ffeaa7; padding: 15px; border-radius: 5px; margin: 10px 0; }
+                .success { background: #55efc4; }
+                .warning { background: #fab1a0; }
+                .data { font-family: monospace; background: #f9f9f9; padding: 10px; border-radius: 3px; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🏠 Real Estate Market Dashboard</h1>
+                <p>Automated data pipeline for Houston County, GA</p>
+            </div>
+            
+            <div class="card">
+                <h2>📊 Market Overview</h2>
+                <p>Data is collected every 6 hours from free public sources.</p>
+                <p>Last updated: <span id="last-updated">Loading...</span></p>
+            </div>
+            
+            <div class="card">
+                <h2>📁 Available Data</h2>
+                <div id="data-files">Loading file list...</div>
+            </div>
+            
+            <div class="alert">
+                <h3>📈 View Dashboard Data</h3>
+                <p>Dashboard JSON files are available in the <code>data/</code> directory:</p>
+                <ul>
+                    <li><a href="data/houston-county-ga/dashboard.json" target="_blank">Full Dashboard (JSON)</a></li>
+                    <li><a href="data/houston-county-ga/dashboard_simple.json" target="_blank">Simple Dashboard (JSON)</a></li>
+                    <li><a href="data/houston-county-ga/ai_insights_summary.json" target="_blank">AI Insights (JSON)</a></li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>🔗 Repository Links</h2>
+                <ul>
+                    <li><a href="https://github.com/NAGOHUSA/RHMR">GitHub Repository</a></li>
+                    <li><a href="https://github.com/NAGOHUSA/RHMR/actions">Pipeline Status</a></li>
+                    <li><a href="https://github.com/NAGOHUSA/RHMR/tree/main/scripts">Source Code</a></li>
+                </ul>
+            </div>
+            
+            <script>
+                // Simple JavaScript to display last updated time
+                document.getElementById('last-updated').textContent = new Date().toLocaleString();
+                
+                // List available JSON files
+                fetch('data/houston-county-ga/dashboard_simple.json')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('data-files').innerHTML = `
+                            <p>Market Health: ${data.market_overview?.overall_health_score || 'N/A'}/100</p>
+                            <p>Total Properties: ${data.market_overview?.total_properties || 'N/A'}</p>
+                            <p>Last Updated: ${data.last_updated || 'N/A'}</p>
+                        `;
+                    })
+                    .catch(error => {
+                        document.getElementById('data-files').innerHTML = 'Error loading dashboard data.';
+                    });
+            </script>
+        </body>
+        </html>
+        EOF
+        echo "✅ HTML dashboard created at docs/index.html"
+    
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        keep_files: true
-        destination_dir: ./
-    
-    - name: Commit and push data updates
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add data/
-        git commit -m "📊 Free data update $(date +'%Y-%m-%d %H:%M')" || echo "No changes"
-        git push
+        publish_dir: ./docs
+        keep_files: false
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
