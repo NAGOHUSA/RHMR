@@ -3,7 +3,7 @@ name: Free Real Estate Data Pipeline
 
 on:
   schedule:
-    - cron: "0 */6 * * *"  # Every 6 hours (free tier allows 2000 minutes/month)
+    - cron: "0 */6 * * *"  # Every 6 hours
     - cron: "0 8,14,20 * * *"  # 3 times daily (8 AM, 2 PM, 8 PM UTC)
   workflow_dispatch:
   push:
@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip install requests beautifulsoup4 pandas numpy
-        echo "All dependencies are free and open source"
+        echo "✅ All dependencies installed"
     
     - name: Create directory structure
       run: |
@@ -35,19 +35,14 @@ jobs:
         mkdir -p data/houston-county-ga
         mkdir -p data/houston-county-ga/${{ matrix.zip }}
     
-    - name: Copy free data collector
-      run: |
-        # Copy the collector script (would be in your repo)
-        echo "Using free data collector script..."
-    
-    - name: Collect free data
+    - name: Collect free data for ZIP ${{ matrix.zip }}
       run: |
         echo "Collecting free data for ZIP ${{ matrix.zip }}..."
-        python scripts/free_data_collector.py --zip ${{ matrix.zip }}
+        python scripts/free_data_collector.py
     
     - name: Archive collected data
       run: |
-        echo "Data collected for ${{ matrix.zip }}"
+        echo "📁 Data collected for ${{ matrix.zip }:"
         ls -la data/houston-county-ga/${{ matrix.zip }}/
     
   generate-ai-insights:
@@ -63,22 +58,28 @@ jobs:
     - name: Install AI dependencies
       run: pip install requests
     
-    - name: Generate DeepSeek AI insights
+    - name: Generate AI insights
+      env:
+        DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       run: |
-        echo "Generating AI insights with DeepSeek (free API)..."
-        export DEEPSEEK_API_KEY=${{ secrets.DEEPSEEK_API_KEY }}
+        echo "🤖 Generating AI insights..."
         python scripts/deepseek_ai_insights.py
     
-    - name: Create aggregated dashboard data
+    - name: Create dashboard
       run: |
-        echo "Creating dashboard JSON files..."
+        echo "📊 Creating dashboard JSON files..."
         python scripts/create_dashboard_json.py
+    
+    - name: Run full pipeline
+      run: |
+        echo "🚀 Running complete pipeline..."
+        python scripts/run_pipeline.py
     
     - name: Verify generated files
       run: |
-        echo "Generated files:"
+        echo "📋 Generated files:"
         find data/houston-county-ga -name "*.json" -type f | head -20
-        echo "Total files:"
+        echo "📊 Total files generated:"
         find data/houston-county-ga -name "*.json" -type f | wc -l
     
   deploy-dashboard:
