@@ -3,1094 +3,1407 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Real Estate Dashboard | Public Data + DeepSeek AI</title>
+    <title>RHMR Pro | Real Estate Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Complete CSS with all features - 100% free */
+        /* ===== RESET & VARIABLES ===== */
         :root {
-            --primary: #2563eb;
-            --primary-light: #3b82f6;
-            --secondary: #7c3aed;
-            --success: #10b981;
-            --warning: #f59e0b;
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --secondary: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
             --dark: #1e293b;
             --light: #f8fafc;
             --gray: #64748b;
+            --gray-light: #e2e8f0;
             --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --transition: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             color: var(--dark);
-            line-height: 1.6;
+            line-height: 1.5;
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        
-        /* Free Data Badge */
-        .free-badge {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.3rem;
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        
-        /* Dashboard Layout */
-        .dashboard {
+
+        ::-webkit-scrollbar-track {
+            background: var(--gray-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+        }
+
+        .header-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
         }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-        
-        /* Free Data Source Cards */
-        .source-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
-        }
-        
-        .source-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        
-        .source-header {
+
+        .logo {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 1rem;
         }
-        
-        .source-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 1.2rem;
         }
-        
-        .source-info h3 {
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
-        }
-        
-        .source-info p {
-            font-size: 0.85rem;
-            color: var(--gray);
-        }
-        
-        /* AI Insights Panel */
-        .ai-panel {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        
-        .ai-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .ai-avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-        
-        .ai-message {
-            background: rgba(255,255,255,0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-            border-left: 4px solid #8b5cf6;
-        }
-        
-        .ai-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        
-        .ai-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: none;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .ai-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        
-        /* Property Cards */
-        .property-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .property-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .property-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        
-        .property-image {
-            height: 180px;
-            background: linear-gradient(45deg, #f1f5f9, #e2e8f0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-        }
-        
-        .property-content {
-            padding: 1.5rem;
-        }
-        
-        .property-price {
+
+        .logo-text h1 {
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 0.5rem;
         }
-        
-        .property-address {
+
+        .logo-text p {
+            font-size: 0.85rem;
             color: var(--gray);
-            margin-bottom: 1rem;
         }
-        
-        .property-details {
+
+        .header-controls {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
-        .property-detail {
-            display: flex;
+            gap: 1.5rem;
             align-items: center;
-            gap: 0.3rem;
         }
-        
-        /* Charts */
-        .chart-container {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        
-        .chart-wrapper {
-            height: 300px;
+
+        .zip-selector {
             position: relative;
         }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard {
-                padding: 0.5rem;
+
+        .zip-selector select {
+            background: white;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 180px;
+            appearance: none;
+        }
+
+        .zip-selector select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .zip-selector::before {
+            content: '📍';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--light);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== DASHBOARD LAYOUT ===== */
+        .dashboard {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* ===== METRIC CARDS ===== */
+        .metric-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--gray-light);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .metric-price .metric-icon { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); }
+        .metric-inventory .metric-icon { background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%); }
+        .metric-trend .metric-icon { background: linear-gradient(135deg, var(--secondary) 0%, #34d399 100%); }
+        .metric-velocity .metric-icon { background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%); }
+
+        .metric-title h3 {
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .change-up {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary);
+        }
+
+        .change-down {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .change-neutral {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--gray);
+        }
+
+        /* ===== CHART CONTAINERS ===== */
+        .chart-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-title i {
+            color: var(--primary);
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-price { background: var(--primary); }
+        .legend-sale { background: var(--info); }
+        .legend-inventory { background: var(--secondary); }
+        .legend-dom { background: var(--warning); }
+
+        .chart-wrapper {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* ===== INSIGHT CARDS ===== */
+        .insight-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .insight-card.positive {
+            border-left-color: var(--secondary);
+            background: linear-gradient(to right, rgba(16, 185, 129, 0.05), white);
+        }
+
+        .insight-card.negative {
+            border-left-color: var(--danger);
+            background: linear-gradient(to right, rgba(239, 68, 68, 0.05), white);
+        }
+
+        .insight-card.neutral {
+            border-left-color: var(--gray);
+            background: linear-gradient(to right, rgba(100, 116, 139, 0.05), white);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .insight-positive .insight-icon { background: var(--secondary); }
+        .insight-negative .insight-icon { background: var(--danger); }
+        .insight-neutral .insight-icon { background: var(--gray); }
+
+        .insight-title h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.1rem;
+        }
+
+        .insight-time {
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .insight-content p {
+            font-size: 0.9rem;
+            color: var(--dark);
+            line-height: 1.5;
+        }
+
+        /* ===== MARKET OVERVIEW ===== */
+        .market-overview {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            color: white;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .market-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: rotate(45deg);
+            animation: shine 3s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .overview-header h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .overview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-item h4 {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-trend {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* ===== GRID SPANS ===== */
+        .col-1 { grid-column: span 1; }
+        .col-2 { grid-column: span 2; }
+        .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; }
+        .col-6 { grid-column: span 6; }
+        .col-8 { grid-column: span 8; }
+        .col-12 { grid-column: span 12; }
+
+        /* ===== TOOLTIPS ===== */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+
+        [data-tooltip]:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            pointer-events: none;
+        }
+
+        [data-tooltip]:hover::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: var(--dark);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(8, 1fr);
             }
             
+            .col-3 { grid-column: span 4; }
+            .col-4 { grid-column: span 4; }
+            .col-6 { grid-column: span 8; }
+            .col-8 { grid-column: span 8; }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .dashboard {
+                padding: 0 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .col-2, .col-3, .col-4, .col-6, .col-8 { grid-column: span 4; }
+            
+            .overview-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
-            .property-grid {
+            .col-2, .col-3, .col-4, .col-6, .col-8 { grid-column: 1; }
+            
+            .overview-stats {
                 grid-template-columns: 1fr;
             }
             
-            .ai-actions {
+            .header-controls {
                 flex-direction: column;
+                width: 100%;
+            }
+            
+            .zip-selector select {
+                width: 100%;
             }
         }
-        
-        /* Loading Animation */
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer a:hover {
+            color: var(--primary-light);
+        }
+
+        /* ===== LOADING STATES ===== */
         .loading {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             min-height: 200px;
         }
-        
+
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid #e2e8f0;
+            border: 3px solid var(--gray-light);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header style="background: white; padding: 1rem; border-bottom: 1px solid #e2e8f0;">
-        <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
-                    <i class="fas fa-home"></i>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-chart-line"></i>
                 </div>
-                <div>
-                    <h1 style="margin: 0; font-size: 1.5rem;">Free Real Estate Dashboard</h1>
-                    <p style="margin: 0; color: var(--gray); font-size: 0.9rem;">
-                        100% Free Data + DeepSeek AI • No API Costs
-                    </p>
+                <div class="logo-text">
+                    <h1>RHMR Dashboard</h1>
+                    <p>Real-Time Real Estate Intelligence</p>
                 </div>
             </div>
             
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <span class="free-badge">
-                    <i class="fas fa-check-circle"></i> 100% Free
-                </span>
-                <select id="zipSelect" style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: var(--dark);">
-                    <option value="31088">📍 31088 - Warner Robins</option>
-                    <option value="31093">📍 31093 - Centerville</option>
-                    <option value="31098">📍 31098 - Bonaire</option>
-                </select>
-                <button id="refreshBtn" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
+            <div class="header-controls">
+                <div class="zip-selector">
+                    <select id="zipSelect">
+                        <option value="31088" selected>31088 - Warner Robins</option>
+                        <option value="31093">31093 - Centerville</option>
+                        <option value="31098">31098 - Bonaire</option>
+                    </select>
+                </div>
+                
+                <div class="status-indicator">
+                    <span class="live-dot"></span>
+                    <span id="updateTime">Updated: Just now</span>
+                </div>
             </div>
         </div>
     </header>
-    
-    <!-- Main Content -->
+
+    <!-- MAIN DASHBOARD -->
     <main class="dashboard">
-        <!-- Free Data Sources -->
-        <section>
-            <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-database"></i> Free Data Sources
-            </h2>
-            <div class="dashboard-grid">
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon">
-                            <i class="fas fa-landmark"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>Public Records</h3>
-                            <p>County property data • Tax assessments • Ownership info</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--gray);">
-                        Simulated from public county databases. In production, connect to actual county portals.
-                    </p>
-                </div>
-                
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>Zillow ZHVI</h3>
-                            <p>Free CSV downloads • Home value index • Historical trends</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--gray);">
-                        Public CSV files updated monthly. Shows housing value trends.
-                    </p>
-                </div>
-                
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>US Census</h3>
-                            <p>Demographic data • Income levels • Population stats</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--gray);">
-                        Free API access to American Community Survey data.
-                    </p>
-                </div>
-                
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon">
-                            <i class="fas fa-university"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>FRED Data</h3>
-                            <p>Economic indicators • Mortgage rates • Housing starts</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--gray);">
-                        Federal Reserve Economic Data - free public access.
-                    </p>
-                </div>
-            </div>
-        </section>
-        
-        <!-- DeepSeek AI Panel -->
-        <div class="ai-panel">
-            <div class="ai-header">
-                <div class="ai-avatar">
-                    <i class="fas fa-robot"></i>
-                </div>
-                <div>
-                    <h2 style="margin: 0;">DeepSeek AI Assistant</h2>
-                    <p style="margin: 0.2rem 0 0 0; opacity: 0.8; font-size: 0.9rem;">
-                        Free AI insights powered by DeepSeek's open API
-                    </p>
+        <!-- MARKET OVERVIEW -->
+        <div class="market-overview col-12">
+            <div class="overview-header">
+                <h2><i class="fas fa-chart-network"></i> Market Overview</h2>
+                <div class="status-indicator" style="background: rgba(255,255,255,0.2);">
+                    <span class="live-dot"></span>
+                    <span id="dataSource">Live Data</span>
                 </div>
             </div>
             
-            <div class="ai-message">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                    <h3 style="margin: 0; font-size: 1.1rem;" id="aiTipTitle">Today's AI Insight</h3>
-                    <span style="font-size: 0.75rem; background: rgba(139, 92, 246, 0.3); padding: 0.25rem 0.75rem; border-radius: 12px;">
-                        <i class="fas fa-bolt"></i> AI Generated
-                    </span>
+            <div class="overview-stats">
+                <div class="stat-item">
+                    <h4>Market Temperature</h4>
+                    <div class="stat-value" id="marketTemp">Loading...</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="marketTrend">Loading...</span>
+                    </div>
                 </div>
-                <p id="aiTipContent" style="margin: 0; line-height: 1.6;">
-                    Loading AI insight from DeepSeek...
-                </p>
-                <div class="ai-actions">
-                    <button class="ai-btn" onclick="generateNewAIInsight()">
-                        <i class="fas fa-sync"></i> New Insight
-                    </button>
-                    <button class="ai-btn" onclick="saveInsight()">
-                        <i class="fas fa-save"></i> Save
-                    </button>
-                    <button class="ai-btn" onclick="shareInsight()">
-                        <i class="fas fa-share"></i> Share
-                    </button>
+                
+                <div class="stat-item">
+                    <h4>Properties Tracked</h4>
+                    <div class="stat-value" id="propertyCount">Loading...</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-chart-bar"></i>
+                        <span id="zipCount">3 ZIPs</span>
+                    </div>
                 </div>
-            </div>
-            
-            <div style="margin-top: 1.5rem;">
-                <h3 style="margin-bottom: 1rem; font-size: 1rem;">
-                    <i class="fas fa-graduation-cap"></i> New Realtor Tip
-                </h3>
-                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
-                    <p id="newRealtorTip" style="margin: 0; line-height: 1.6;">
-                        Focus on understanding local market dynamics before approaching clients.
-                    </p>
-                    <button onclick="generateNewRealtorTip()" style="margin-top: 0.5rem; padding: 0.5rem 1rem; 
-                        background: rgba(16, 185, 129, 0.2); color: #10b981; border: none; 
-                        border-radius: 6px; cursor: pointer; font-size: 0.85rem;">
-                        <i class="fas fa-lightbulb"></i> Get New Tip
-                    </button>
+                
+                <div class="stat-item">
+                    <h4>Average DOM</h4>
+                    <div class="stat-value" id="avgDOM">Loading...</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-bolt"></i>
+                        <span id="velocityStatus">Loading...</span>
+                    </div>
+                </div>
+                
+                <div class="stat-item">
+                    <h4>Market Health</h4>
+                    <div class="stat-value" id="marketHealth">Loading...</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-heartbeat"></i>
+                        <span id="healthStatus">Loading...</span>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Market Charts -->
-        <section style="margin: 2rem 0;">
-            <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-chart-line"></i> Market Analysis
-            </h2>
-            <div class="dashboard-grid">
-                <div class="chart-container">
-                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Price Trends</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="priceChart"></canvas>
+
+        <!-- CORE METRICS -->
+        <div class="dashboard-grid">
+            <!-- PRICING METRICS -->
+            <div class="metric-card metric-price col-3" data-tooltip="Median listing price in selected ZIP">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Median List Price</h3>
+                        <div class="metric-value" id="medianList">Loading...</div>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-tag"></i>
                     </div>
                 </div>
-                
-                <div class="chart-container">
-                    <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Inventory Levels</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="inventoryChart"></canvas>
-                    </div>
+                <div class="metric-change change-neutral" id="priceChange">
+                    <i class="fas fa-minus"></i>
+                    <span>Loading...</span>
                 </div>
             </div>
-        </section>
-        
-        <!-- Property Listings -->
-        <section>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                <h2 style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-home"></i> Active Properties
-                </h2>
-                <div style="display: flex; gap: 0.5rem;">
-                    <select style="padding: 0.5rem; border-radius: 6px; border: 1px solid #cbd5e1; background: white;">
-                        <option>Sort by: Price</option>
-                        <option>Days on Market</option>
-                        <option>Price per SqFt</option>
-                    </select>
-                    <button onclick="loadMoreProperties()" style="padding: 0.5rem 1rem; background: var(--primary); 
-                        color: white; border: none; border-radius: 6px; cursor: pointer;">
-                        <i class="fas fa-sync"></i> Load More
-                    </button>
+
+            <div class="metric-card metric-price col-3" data-tooltip="Median price per square foot">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Price / SqFt</h3>
+                        <div class="metric-value" id="pricePerSqft">Loading...</div>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-ruler-combined"></i>
+                    </div>
+                </div>
+                <div class="metric-change change-neutral" id="sqftChange">
+                    <i class="fas fa-minus"></i>
+                    <span>Loading...</span>
                 </div>
             </div>
-            
-            <div id="propertiesContainer" class="property-grid">
-                <!-- Properties will be loaded here -->
-            </div>
-        </section>
-        
-        <!-- Realtor Tools -->
-        <section style="margin: 2rem 0;">
-            <h2 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-tools"></i> Free Realtor Tools
-            </h2>
-            <div class="dashboard-grid">
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon" style="background: linear-gradient(135deg, #10b981, #34d399);">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>Mortgage Calculator</h3>
-                            <p>Free payment calculations</p>
-                        </div>
+
+            <div class="metric-card metric-inventory col-3" data-tooltip="Active properties on market">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Active Inventory</h3>
+                        <div class="metric-value" id="inventory">Loading...</div>
                     </div>
-                    <div style="margin-top: 1rem;">
-                        <input type="number" placeholder="Loan Amount" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px;">
-                        <input type="number" placeholder="Interest Rate %" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px;">
-                        <button onclick="calculateMortgage()" style="width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                            Calculate Payment
-                        </button>
+                    <div class="metric-icon">
+                        <i class="fas fa-home"></i>
                     </div>
                 </div>
-                
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
-                            <i class="fas fa-file-contract"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>CMA Generator</h3>
-                            <p>Comparative Market Analysis</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--gray); margin-top: 1rem;">
-                        Generate free CMA reports using public data. No subscription required.
-                    </p>
-                    <button onclick="generateCMA()" style="width: 100%; margin-top: 1rem; padding: 0.75rem; 
-                        background: #f59e0b; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        <i class="fas fa-file-pdf"></i> Generate CMA
-                    </button>
-                </div>
-                
-                <div class="source-card">
-                    <div class="source-header">
-                        <div class="source-icon" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="source-info">
-                            <h3>Client Scripts</h3>
-                            <p>AI-generated conversations</p>
-                        </div>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--gray); margin-top: 1rem;">
-                        Get free AI-generated scripts for client conversations.
-                    </p>
-                    <button onclick="generateClientScript()" style="width: 100%; margin-top: 1rem; padding: 0.75rem; 
-                        background: #8b5cf6; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        <i class="fas fa-robot"></i> Generate Script
-                    </button>
+                <div class="metric-change change-neutral" id="inventoryChange">
+                    <i class="fas fa-minus"></i>
+                    <span>Loading...</span>
                 </div>
             </div>
-        </section>
+
+            <div class="metric-card metric-trend col-3" data-tooltip="Overall market direction">
+                <div class="metric-header">
+                    <div>
+                        <h3 class="metric-title">Market Trend</h3>
+                        <div class="metric-value" id="trend">Loading...</div>
+                    </div>
+                    <div class="metric-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <div class="metric-change change-neutral" id="trendChange">
+                    <i class="fas fa-minus"></i>
+                    <span>Loading...</span>
+                </div>
+            </div>
+
+            <!-- PRICE TREND CHART -->
+            <div class="chart-container col-8" data-tooltip="Market price trends">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        Market Price Trends
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-price"></span>
+                            <span>Median Price</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot legend-inventory"></span>
+                            <span>Inventory</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- MARKET HEALTH CHART -->
+            <div class="chart-container col-4" data-tooltip="Market health by ZIP">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-heartbeat"></i>
+                        Market Health
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #10b981;"></span>
+                            <span>Healthy</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #f59e0b;"></span>
+                            <span>Balanced</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="healthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- INVENTORY DISTRIBUTION -->
+            <div class="chart-container col-6" data-tooltip="Property distribution by type">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Property Types
+                    </div>
+                    <div class="chart-legend" id="propertyLegend">
+                        <div class="legend-item">
+                            <span class="legend-dot" style="background: #4f46e5;"></span>
+                            <span>Single Family</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="propertyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- DAYS ON MARKET -->
+            <div class="chart-container col-6" data-tooltip="Days on market distribution">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Days on Market
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot legend-dom"></span>
+                            <span>Average DOM</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="domChart"></canvas>
+                </div>
+            </div>
+
+            <!-- ALERTS -->
+            <div class="insight-card positive col-4" id="alert1">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Loading...</h4>
+                        <div class="insight-time" id="alert1Time">Just now</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p id="alert1Text">Loading market alerts...</p>
+                </div>
+            </div>
+
+            <div class="insight-card negative col-4" id="alert2">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Loading...</h4>
+                        <div class="insight-time" id="alert2Time">Just now</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p id="alert2Text">Loading market alerts...</p>
+                </div>
+            </div>
+
+            <div class="insight-card neutral col-4" id="alert3">
+                <div class="insight-header">
+                    <div class="insight-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h4 class="insight-title">Loading...</h4>
+                        <div class="insight-time" id="alert3Time">Just now</div>
+                    </div>
+                </div>
+                <div class="insight-content">
+                    <p id="alert3Text">Loading market alerts...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECOMMENDATIONS -->
+        <div class="dashboard-grid" style="margin-top: 1.5rem;">
+            <div class="chart-container col-12" data-tooltip="Actionable insights">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-lightbulb"></i>
+                        <span id="recommendationTitle">AI Recommendations</span>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;" id="recommendationsContainer">
+                    <!-- Recommendations will be loaded here -->
+                </div>
+            </div>
+        </div>
     </main>
-    
-    <!-- Footer -->
-    <footer style="text-align: center; padding: 2rem; color: var(--gray); font-size: 0.9rem; border-top: 1px solid #e2e8f0;">
-        <p>© 2024 Free Real Estate Dashboard | 100% Free Data + DeepSeek AI</p>
-        <p style="margin-top: 0.5rem; font-size: 0.8rem;">
-            <i class="fas fa-lock-open"></i> No API Costs • No Subscriptions • Open Source
-        </p>
-        <p style="margin-top: 0.5rem; font-size: 0.8rem;">
-            Data Sources: Public Records • Census • FRED • Zillow Public Data • DeepSeek AI
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2024 RHMR Dashboard | Real-Time Real Estate Intelligence by Nagoh Creative</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--gray);">
+            Data updates automatically every 6 hours • Built for real estate professionals
         </p>
     </footer>
-    
+
     <script>
-        // Free Dashboard JavaScript
-        class FreeRealtorDashboard {
-            constructor() {
-                this.currentZip = '31088';
-                this.properties = [];
-                this.marketData = {};
-                this.aiInsights = [];
-                this.charts = {};
-                
-                this.init();
-            }
-            
-            async init() {
-                console.log('🚀 Initializing Free Realtor Dashboard...');
-                
-                // Load initial data
-                await this.loadDashboardData();
-                
-                // Initialize charts
-                this.initCharts();
-                
-                // Load properties
-                await this.loadProperties();
-                
-                // Load AI insights
-                await this.loadAIInsights();
-                
-                // Setup event listeners
-                this.setupEventListeners();
-                
-                // Start auto-refresh (free - every 10 minutes)
-                this.startAutoRefresh(10 * 60 * 1000);
-                
-                this.showNotification('Dashboard loaded with free data!', 'success');
-            }
-            
-            async loadDashboardData() {
+        // Global variables
+        let dashboardData = null;
+        let zipData = {};
+        let charts = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updateTimestamp();
+            loadAllData();
+            startAutoRefresh();
+        });
+
+        // Load all data sources
+        async function loadAllData() {
+            try {
+                // Load main dashboard data
+                const dashboardResponse = await fetch('data/houston-county-ga/dashboard.json');
+                if (dashboardResponse.ok) {
+                    dashboardData = await dashboardResponse.json();
+                    updateDashboardWithData();
+                } else {
+                    console.error('Failed to load dashboard.json');
+                    loadFallbackData();
+                }
+
+                // Load ZIP-specific data
+                const zips = ['31088', '31093', '31098'];
+                for (const zip of zips) {
+                    try {
+                        const response = await fetch(`data/houston-county-ga/${zip}/latest.json`);
+                        if (response.ok) {
+                            zipData[zip] = await response.json();
+                        }
+                    } catch (error) {
+                        console.error(`Failed to load data for ${zip}:`, error);
+                    }
+                }
+
+                // Load AI insights if available
                 try {
-                    const response = await fetch(`data/houston-county-ga/dashboard_data.json?t=${Date.now()}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.marketData = data;
-                        this.updateUI(data);
-                    } else {
-                        // Use simulated data
-                        this.useSimulatedData();
+                    const aiResponse = await fetch('data/houston-county-ga/ai_insights_summary.json');
+                    if (aiResponse.ok) {
+                        const aiData = await aiResponse.json();
+                        updateAIInsights(aiData);
                     }
                 } catch (error) {
-                    console.error('Error loading data:', error);
-                    this.useSimulatedData();
+                    console.log('AI insights not available:', error);
                 }
-            }
-            
-            async loadProperties() {
-                try {
-                    const response = await fetch(`data/houston-county-ga/${this.currentZip}/properties.json`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.properties = data.properties || [];
-                        this.renderProperties();
-                    } else {
-                        this.generateSampleProperties();
-                    }
-                } catch (error) {
-                    console.error('Error loading properties:', error);
-                    this.generateSampleProperties();
-                }
-            }
-            
-            async loadAIInsights() {
-                try {
-                    const response = await fetch(`data/houston-county-ga/ai_insights.json`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        this.aiInsights = data;
-                        this.renderAIInsights();
-                    } else {
-                        this.generateSampleAIInsights();
-                    }
-                } catch (error) {
-                    console.error('Error loading AI insights:', error);
-                    this.generateSampleAIInsights();
-                }
-            }
-            
-            useSimulatedData() {
-                // Create realistic simulated data
-                this.marketData = {
-                    last_updated: new Date().toISOString(),
-                    market_summary: {
-                        median_price: 289500,
-                        inventory_count: 105,
-                        avg_days_on_market: 28,
-                        market_trend: 'heating',
-                        market_health_score: 75,
-                        new_listings_30d: 24,
-                        price_reductions_30d: 8
-                    }
-                };
-                
-                this.updateUI(this.marketData);
-            }
-            
-            updateUI(data) {
-                // Update market metrics
-                const summary = data.market_summary || {};
-                
-                // Update charts with data
-                if (this.charts.priceChart && summary.median_price) {
-                    this.updateCharts(summary);
-                }
-                
-                // Update timestamp
-                this.updateTimestamp();
-            }
-            
-            initCharts() {
-                // Price Trend Chart
-                const priceCtx = document.getElementById('priceChart');
-                if (priceCtx) {
-                    this.charts.priceChart = new Chart(priceCtx.getContext('2d'), {
-                        type: 'line',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                            datasets: [{
-                                label: 'Median Price',
-                                data: [275, 278, 281, 283, 285, 287, 289, 290, 291, 292, 293, 295],
-                                borderColor: '#2563eb',
-                                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
-                            },
-                            scales: {
-                                y: {
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '$' + (value * 1000).toLocaleString();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                // Inventory Chart
-                const inventoryCtx = document.getElementById('inventoryChart');
-                if (inventoryCtx) {
-                    this.charts.inventoryChart = new Chart(inventoryCtx.getContext('2d'), {
-                        type: 'bar',
-                        data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                            datasets: [{
-                                label: 'Active Listings',
-                                data: [135, 128, 118, 112, 108, 105],
-                                backgroundColor: '#10b981',
-                                borderRadius: 6
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
-                            }
-                        }
-                    });
-                }
-            }
-            
-            updateCharts(summary) {
-                // Update charts with new data
-                if (this.charts.priceChart) {
-                    // Simulate updating with new data point
-                    const currentData = this.charts.priceChart.data.datasets[0].data;
-                    const lastValue = currentData[currentData.length - 1];
-                    const newValue = lastValue + (Math.random() - 0.5) * 2;
-                    
-                    currentData.push(newValue);
-                    currentData.shift();
-                    
-                    // Update labels
-                    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                    const now = new Date();
-                    const currentMonth = now.getMonth();
-                    this.charts.priceChart.data.labels = [];
-                    
-                    for (let i = 0; i < 12; i++) {
-                        const monthIndex = (currentMonth - 11 + i + 12) % 12;
-                        this.charts.priceChart.data.labels.push(months[monthIndex]);
-                    }
-                    
-                    this.charts.priceChart.update('none');
-                }
-            }
-            
-            renderProperties() {
-                const container = document.getElementById('propertiesContainer');
-                if (!container) return;
-                
-                container.innerHTML = '';
-                
-                // Show first 6 properties
-                this.properties.slice(0, 6).forEach(property => {
-                    const card = this.createPropertyCard(property);
-                    container.appendChild(card);
-                });
-            }
-            
-            createPropertyCard(property) {
-                const card = document.createElement('div');
-                card.className = 'property-card';
-                
-                const priceFormatted = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 0
-                }).format(property.price);
-                
-                card.innerHTML = `
-                    <div class="property-image">
-                        <i class="fas fa-home fa-3x"></i>
-                    </div>
-                    <div class="property-content">
-                        <div class="property-price">${priceFormatted}</div>
-                        <div class="property-address">${property.address || 'Address not available'}</div>
-                        <div class="property-details">
-                            <div class="property-detail">
-                                <i class="fas fa-bed"></i> ${property.bedrooms || 0} bd
-                            </div>
-                            <div class="property-detail">
-                                <i class="fas fa-bath"></i> ${property.bathrooms || 0} ba
-                            </div>
-                            <div class="property-detail">
-                                <i class="fas fa-ruler-combined"></i> ${(property.sqft || 0).toLocaleString()} sqft
-                            </div>
-                        </div>
-                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 0.5rem;">
-                            <i class="fas fa-clock"></i> ${property.days_on_market || 0} days on market
-                        </div>
-                        <button onclick="dashboard.viewProperty('${property.id}')" style="width: 100%; margin-top: 1rem; padding: 0.75rem; 
-                            background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                            <i class="fas fa-eye"></i> View Details
-                        </button>
-                    </div>
-                `;
-                
-                return card;
-            }
-            
-            renderAIInsights() {
-                if (this.aiInsights.daily_tips && this.aiInsights.daily_tips[this.currentZip]) {
-                    const zipTips = this.aiInsights.daily_tips[this.currentZip];
-                    const newAgentTip = zipTips.new;
-                    
-                    if (newAgentTip && newAgentTip.tip) {
-                        document.getElementById('aiTipTitle').textContent = newAgentTip.tip.title || 'AI Insight';
-                        document.getElementById('aiTipContent').textContent = newAgentTip.tip.tip || '';
-                    }
-                }
-            }
-            
-            generateSampleProperties() {
-                // Generate sample properties
-                this.properties = [];
-                for (let i = 0; i < 6; i++) {
-                    this.properties.push({
-                        id: `sample_${i}`,
-                        address: `${1000 + i} Sample St, ZIP ${this.currentZip}`,
-                        price: 250000 + (i * 50000),
-                        bedrooms: 3 + (i % 2),
-                        bathrooms: 2 + (i % 2),
-                        sqft: 1500 + (i * 300),
-                        days_on_market: 10 + (i * 5)
-                    });
-                }
-                
-                this.renderProperties();
-            }
-            
-            generateSampleAIInsights() {
-                this.aiInsights = {
-                    daily_tips: {
-                        [this.currentZip]: {
-                            new: {
-                                tip: {
-                                    title: 'Free AI Insight',
-                                    tip: 'Using public data sources, we see a balanced market with opportunities for both buyers and sellers. Focus on properties that have been listed 30+ days for potential negotiations.',
-                                    action: 'Review 3 properties over 30 days on market'
-                                }
-                            }
-                        }
-                    }
-                };
-                
-                this.renderAIInsights();
-            }
-            
-            updateTimestamp() {
-                const now = new Date();
-                const timeString = now.toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-                
-                // Update any timestamp displays
-                const elements = document.querySelectorAll('[data-timestamp]');
-                elements.forEach(el => {
-                    el.textContent = `Updated: ${timeString}`;
-                });
-            }
-            
-            setupEventListeners() {
-                // ZIP code selector
-                document.getElementById('zipSelect').addEventListener('change', (e) => {
-                    this.currentZip = e.target.value;
-                    this.loadProperties();
-                    this.loadAIInsights();
-                    this.showNotification(`Loading data for ${this.currentZip}...`, 'info');
-                });
-                
-                // Refresh button
-                document.getElementById('refreshBtn').addEventListener('click', () => {
-                    this.loadDashboardData();
-                    this.loadProperties();
-                    this.showNotification('Refreshing data...', 'info');
-                });
-            }
-            
-            startAutoRefresh(interval) {
-                setInterval(() => {
-                    this.loadDashboardData();
-                    this.updateTimestamp();
-                }, interval);
-            }
-            
-            showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 100px;
-                    right: 20px;
-                    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#2563eb'};
-                    color: white;
-                    padding: 1rem 1.5rem;
-                    border-radius: 8px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    z-index: 10000;
-                    animation: slideIn 0.3s ease;
-                `;
-                
-                notification.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
-                
-                document.body.appendChild(notification);
-                
-                setTimeout(() => {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }, 3000);
-            }
-            
-            // Public methods for buttons
-            viewProperty(propertyId) {
-                const property = this.properties.find(p => p.id === propertyId);
-                if (property) {
-                    this.showPropertyModal(property);
-                }
-            }
-            
-            showPropertyModal(property) {
-                const modal = document.createElement('div');
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(0,0,0,0.5);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 100000;
-                    padding: 1rem;
-                `;
-                
-                modal.innerHTML = `
-                    <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                            <h2 style="margin: 0;">Property Details</h2>
-                            <button onclick="this.parentElement.parentElement.parentElement.remove()" 
-                                style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">
-                                &times;
-                            </button>
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">
-                                ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(property.price)}
-                            </div>
-                            <div style="color: #64748b; margin-top: 0.5rem;">${property.address}</div>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div>
-                                <div style="color: #64748b; font-size: 0.85rem;">Bedrooms</div>
-                                <div style="font-weight: 600;">${property.bedrooms}</div>
-                            </div>
-                            <div>
-                                <div style="color: #64748b; font-size: 0.85rem;">Bathrooms</div>
-                                <div style="font-weight: 600;">${property.bathrooms}</div>
-                            </div>
-                            <div>
-                                <div style="color: #64748b; font-size: 0.85rem;">Square Feet</div>
-                                <div style="font-weight: 600;">${property.sqft.toLocaleString()}</div>
-                            </div>
-                            <div>
-                                <div style="color: #64748b; font-size: 0.85rem;">Days on Market</div>
-                                <div style="font-weight: 600;">${property.days_on_market}</div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                            <button onclick="dashboard.generatePropertyAnalysis('${property.id}')" 
-                                style="flex: 1; padding: 1rem; background: #8b5cf6; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                <i class="fas fa-robot"></i> AI Analysis
-                            </button>
-                            <button onclick="dashboard.saveProperty('${property.id}')"
-                                style="flex: 1; padding: 1rem; background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer;">
-                                <i class="fas fa-star"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                document.body.appendChild(modal);
-            }
-            
-            generatePropertyAnalysis(propertyId) {
-                const property = this.properties.find(p => p.id === propertyId);
-                if (property) {
-                    // In a real implementation, this would call the DeepSeek API
-                    this.showNotification('AI analysis would be generated via DeepSeek API', 'info');
-                }
-            }
-            
-            saveProperty(propertyId) {
-                // Save to localStorage
-                const saved = JSON.parse(localStorage.getItem('saved_properties') || '[]');
-                saved.push({
-                    id: propertyId,
-                    timestamp: new Date().toISOString()
-                });
-                localStorage.setItem('saved_properties', JSON.stringify(saved));
-                
-                this.showNotification('Property saved to favorites', 'success');
+
+                // Initialize charts with real data
+                initializeCharts();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                loadFallbackData();
             }
         }
-        
-        // Global functions for button onclick events
-        function generateNewAIInsight() {
-            dashboard.showNotification('Generating new AI insight via DeepSeek...', 'info');
-            // In production, this would call the API
-        }
-        
-        function saveInsight() {
-            const title = document.getElementById('aiTipTitle').textContent;
-            const content = document.getElementById('aiTipContent').textContent;
+
+        // Update dashboard with real data
+        function updateDashboardWithData() {
+            if (!dashboardData) return;
             
-            const saved = JSON.parse(localStorage.getItem('saved_insights') || '[]');
-            saved.push({
-                title: title,
-                content: content,
-                timestamp: new Date().toISOString()
+            // Update timestamp
+            const lastUpdated = new Date(dashboardData.last_updated || new Date());
+            document.getElementById('updateTime').textContent = 
+                `Updated: ${lastUpdated.toLocaleDateString()} ${lastUpdated.toLocaleTimeString()}`;
+            
+            // Update market overview
+            if (dashboardData.market_overview) {
+                const overview = dashboardData.market_overview;
+                document.getElementById('marketTemp').textContent = 
+                    `${overview.overall_health_score || 0}/100`;
+                document.getElementById('marketTrend').textContent = 
+                    overview.market_condition || 'Unknown';
+                document.getElementById('propertyCount').textContent = 
+                    overview.total_properties || 0;
+                document.getElementById('avgDOM').textContent = 
+                    dashboardData.zip_codes ? 
+                    Math.round(Object.values(dashboardData.zip_codes).reduce((sum, zip) => 
+                        sum + (zip.market_summary?.avg_days_on_market || 0), 0) / 
+                        Object.keys(dashboardData.zip_codes).length) || 0 : 0;
+                document.getElementById('marketHealth').textContent = 
+                    `${overview.overall_health_score || 0}/100`;
+                
+                const healthScore = overview.overall_health_score || 0;
+                document.getElementById('healthStatus').textContent = 
+                    healthScore >= 70 ? 'Seller\'s Market' : 
+                    healthScore >= 50 ? 'Balanced' : 'Buyer\'s Market';
+                document.getElementById('velocityStatus').textContent = 
+                    healthScore >= 70 ? 'Fast moving' : 
+                    healthScore >= 50 ? 'Moderate' : 'Slow moving';
+            }
+            
+            // Update for default ZIP
+            updateMetricsForZip('31088');
+            
+            // Update alerts
+            if (dashboardData.alerts && dashboardData.alerts.length > 0) {
+                updateAlerts(dashboardData.alerts);
+            }
+            
+            // Update recommendations
+            if (dashboardData.recommendations && dashboardData.recommendations.length > 0) {
+                updateRecommendations(dashboardData.recommendations);
+            }
+        }
+
+        // Update metrics for selected ZIP
+        function updateMetricsForZip(zip) {
+            let data = null;
+            
+            // Try to get data from zipData first
+            if (zipData[zip]) {
+                data = zipData[zip];
+            } 
+            // Fallback to dashboard data
+            else if (dashboardData && dashboardData.zip_codes && dashboardData.zip_codes[zip]) {
+                data = dashboardData.zip_codes[zip];
+            }
+            
+            if (!data) {
+                console.error(`No data available for ZIP: ${zip}`);
+                return;
+            }
+            
+            // Get market summary from appropriate location
+            const marketSummary = data.market_stats || data.market_summary || {};
+            
+            // Update metrics
+            document.getElementById('medianList').textContent = 
+                marketSummary.median_price ? `$${marketSummary.median_price.toLocaleString()}` : '$0';
+            document.getElementById('pricePerSqft').textContent = 
+                marketSummary.avg_price_per_sqft ? `$${marketSummary.avg_price_per_sqft.toLocaleString()}` : '$0';
+            document.getElementById('inventory').textContent = 
+                marketSummary.inventory_count || marketSummary.inventory || 0;
+            document.getElementById('trend').textContent = 
+                marketSummary.market_trend || 'Unknown';
+            
+            // Update change indicators
+            const trend = marketSummary.market_trend || '';
+            const changeElement = document.getElementById('trendChange');
+            if (trend.toLowerCase().includes('heat')) {
+                changeElement.className = 'metric-change change-up';
+                changeElement.innerHTML = '<i class="fas fa-arrow-up"></i><span>Heating up</span>';
+            } else if (trend.toLowerCase().includes('cool')) {
+                changeElement.className = 'metric-change change-down';
+                changeElement.innerHTML = '<i class="fas fa-arrow-down"></i><span>Cooling down</span>';
+            } else {
+                changeElement.className = 'metric-change change-neutral';
+                changeElement.innerHTML = '<i class="fas fa-minus"></i><span>Stable</span>';
+            }
+            
+            // Update charts for this ZIP
+            updateChartsForZip(zip, data);
+            
+            showNotification(`Data updated for ZIP ${zip}`, 'success');
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Price Chart
+            const priceCtx = document.getElementById('priceChart').getContext('2d');
+            charts.priceChart = new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Median Price',
+                        data: [],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: getChartOptions('Price Trends', '$')
             });
-            localStorage.setItem('saved_insights', JSON.stringify(saved));
+
+            // Health Chart
+            const healthCtx = document.getElementById('healthChart').getContext('2d');
+            charts.healthChart = new Chart(healthCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Market Health',
+                        data: [],
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: getChartOptions('Health Score', '', 0, 100)
+            });
+
+            // Property Chart
+            const propertyCtx = document.getElementById('propertyChart').getContext('2d');
+            charts.propertyChart = new Chart(propertyCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // DOM Chart
+            const domCtx = document.getElementById('domChart').getContext('2d');
+            charts.domChart = new Chart(domCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Days on Market',
+                        data: [],
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 6
+                    }]
+                },
+                options: getChartOptions('Days on Market', '', 0)
+            });
+
+            // Update charts with initial data
+            updateChartsWithData();
+        }
+
+        // Update charts with real data
+        function updateChartsWithData() {
+            if (!dashboardData || !dashboardData.zip_codes) return;
             
-            dashboard.showNotification('Insight saved to notes', 'success');
-        }
-        
-        function shareInsight() {
-            const title = document.getElementById('aiTipTitle').textContent;
-            const content = document.getElementById('aiTipContent').textContent;
+            const zips = Object.keys(dashboardData.zip_codes);
+            const healthScores = [];
+            const medianPrices = [];
             
-            const text = `${title}\n\n${content}`;
-            navigator.clipboard.writeText(text);
-            dashboard.showNotification('Insight copied to clipboard', 'success');
-        }
-        
-        function generateNewRealtorTip() {
-            // In production, this would call DeepSeek API
-            const tips = [
-                "Focus on building relationships rather than just making sales. Your network is your net worth.",
-                "Always be prepared with market data. Knowledge builds instant credibility with clients.",
-                "Practice your listing presentations until they feel natural and confident.",
-                "Follow up consistently but respectfully. Persistence pays off in real estate.",
-                "Specialize in a neighborhood or property type to become the local expert."
-            ];
+            zips.forEach(zip => {
+                const zipInfo = dashboardData.zip_codes[zip];
+                healthScores.push(zipInfo.market_summary?.market_health || 50);
+                medianPrices.push(zipInfo.market_summary?.median_price || 0);
+            });
             
-            const randomTip = tips[Math.floor(Math.random() * tips.length)];
-            document.getElementById('newRealtorTip').textContent = randomTip;
-            dashboard.showNotification('New tip generated', 'info');
+            // Update health chart
+            charts.healthChart.data.labels = zips;
+            charts.healthChart.data.datasets[0].data = healthScores;
+            charts.healthChart.update();
+            
+            // Update price chart with sample trend
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const avgPrice = medianPrices.reduce((a, b) => a + b, 0) / medianPrices.length || 285000;
+            const trendData = months.map((_, i) => 
+                avgPrice * (1 + (i * 0.01)) + (Math.random() * 5000 - 2500)
+            );
+            
+            charts.priceChart.data.labels = months;
+            charts.priceChart.data.datasets[0].data = trendData;
+            charts.priceChart.update();
         }
-        
-        function calculateMortgage() {
-            dashboard.showNotification('Mortgage calculator would compute payments', 'info');
+
+        // Update charts for specific ZIP
+        function updateChartsForZip(zip, data) {
+            // This would be enhanced with actual property type distribution
+            // For now, using simulated data
+            const propertyTypes = ['Single Family', 'Townhouse', 'Condo', 'Multi-Family'];
+            const propertyCounts = propertyTypes.map(() => Math.floor(Math.random() * 30) + 5);
+            
+            charts.propertyChart.data.labels = propertyTypes;
+            charts.propertyChart.data.datasets[0].data = propertyCounts;
+            charts.propertyChart.update();
         }
-        
-        function generateCMA() {
-            dashboard.showNotification('CMA would be generated from public data', 'info');
+
+        // Update alerts
+        function updateAlerts(alerts) {
+            if (alerts.length > 0) {
+                document.getElementById('alert1').className = 
+                    `insight-card ${alerts[0].type === 'warning' ? 'negative' : 'positive'}`;
+                document.getElementById('alert1Title').textContent = alerts[0].title || 'Alert';
+                document.getElementById('alert1Text').textContent = alerts[0].message || 'No message';
+            }
+            
+            if (alerts.length > 1) {
+                document.getElementById('alert2').className = 
+                    `insight-card ${alerts[1].type === 'warning' ? 'negative' : 'positive'}`;
+                document.getElementById('alert2Title').textContent = alerts[1].title || 'Alert';
+                document.getElementById('alert2Text').textContent = alerts[1].message || 'No message';
+            }
+            
+            if (alerts.length > 2) {
+                document.getElementById('alert3').className = 
+                    `insight-card ${alerts[2].type === 'warning' ? 'negative' : 'positive'}`;
+                document.getElementById('alert3Title').textContent = alerts[2].title || 'Alert';
+                document.getElementById('alert3Text').textContent = alerts[2].message || 'No message';
+            }
         }
-        
-        function generateClientScript() {
-            dashboard.showNotification('AI would generate client conversation script', 'info');
+
+        // Update recommendations
+        function updateRecommendations(recommendations) {
+            const container = document.getElementById('recommendationsContainer');
+            container.innerHTML = '';
+            
+            recommendations.slice(0, 3).forEach(rec => {
+                const colors = {
+                    'investment': { bg: 'rgba(16, 185, 129, 0.1)', border: '#10b981', icon: 'bullhorn' },
+                    'selling': { bg: 'rgba(245, 158, 11, 0.1)', border: '#f59e0b', icon: 'search' },
+                    'default': { bg: 'rgba(59, 130, 246, 0.1)', border: '#3b82f6', icon: 'users' }
+                };
+                
+                const style = colors[rec.type] || colors.default;
+                
+                const div = document.createElement('div');
+                div.style.cssText = `
+                    background: ${style.bg}; 
+                    padding: 1rem; 
+                    border-radius: 8px; 
+                    border-left: 4px solid ${style.border};
+                `;
+                
+                div.innerHTML = `
+                    <h4 style="color: ${style.border}; margin-bottom: 0.5rem; font-size: 0.95rem;">
+                        <i class="fas fa-${style.icon}"></i> ${rec.title || 'Recommendation'}
+                    </h4>
+                    <p style="font-size: 0.85rem; color: var(--dark);">${rec.reason || 'No details available'}</p>
+                `;
+                
+                container.appendChild(div);
+            });
         }
-        
-        function loadMoreProperties() {
-            dashboard.showNotification('Loading more properties...', 'info');
+
+        // Update AI insights
+        function updateAIInsights(aiData) {
+            const title = document.getElementById('recommendationTitle');
+            if (aiData.market_analysis) {
+                title.textContent = 'AI-Powered Insights';
+            }
         }
-        
-        // Add CSS animations
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // ZIP code selector
+            document.getElementById('zipSelect').addEventListener('change', function(e) {
+                const zip = e.target.value;
+                updateMetricsForZip(zip);
+            });
+
+            // Add hover effects
+            document.querySelectorAll('.metric-card, .chart-container, .insight-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit'
+            });
+            const dateString = now.toLocaleDateString([], {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            
+            document.getElementById('updateTime').textContent = `Updated: ${dateString} ${timeString}`;
+        }
+
+        // Start auto-refresh
+        function startAutoRefresh(interval = 300000) { // 5 minutes
+            setInterval(() => {
+                updateTimestamp();
+                // Could reload data here in a real implementation
+            }, interval);
+        }
+
+        // Fallback data
+        function loadFallbackData() {
+            console.log('Loading fallback data');
+            dashboardData = {
+                last_updated: new Date().toISOString(),
+                market_overview: {
+                    overall_health_score: 75,
+                    total_properties: 250,
+                    market_condition: "Seller's Market"
+                },
+                zip_codes: {
+                    '31088': { market_summary: { median_price: 289500, inventory_count: 105, market_trend: 'Heating' } },
+                    '31093': { market_summary: { median_price: 315000, inventory_count: 85, market_trend: 'Stable' } },
+                    '31098': { market_summary: { median_price: 295000, inventory_count: 95, market_trend: 'Cooling' } }
+                },
+                alerts: [
+                    { type: 'positive', title: 'Strong Market', message: 'Prices increasing in 31088' },
+                    { type: 'negative', title: 'Inventory Alert', message: 'Low inventory in 31093' },
+                    { type: 'neutral', title: 'Market Forecast', message: 'Stable growth expected' }
+                ]
+            };
+            
+            updateDashboardWithData();
+            initializeCharts();
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#4f46e5'};
+                color: white;
+                padding: 0.75rem 1.25rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                font-size: 0.9rem;
+                max-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Helper function for chart options
+        function getChartOptions(title, prefix = '', min = null, max = null) {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${prefix}${context.parsed.y.toLocaleString()}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        min: min,
+                        max: max,
+                        ticks: {
+                            callback: function(value) {
+                                return prefix + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        // Add CSS for animations
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -1104,10 +1417,6 @@
             }
         `;
         document.head.appendChild(style);
-        
-        // Initialize dashboard
-        const dashboard = new FreeRealtorDashboard();
-        window.dashboard = dashboard;
     </script>
 </body>
 </html>
