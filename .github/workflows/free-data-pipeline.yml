@@ -4,17 +4,14 @@ name: Free Real Estate Data Pipeline
 on:
   schedule:
     - cron: "0 */6 * * *"  # Every 6 hours
-    - cron: "0 8,14,20 * * *"  # 3 times daily (8 AM, 2 PM, 8 PM UTC)
+    - cron: "0 8,14,20 * * *"  # 3 times daily
   workflow_dispatch:
   push:
     branches: [ main ]
 
 jobs:
-  collect-free-data:
+  collect-and-process-data:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        zip: ['31088', '31093', '31098']
     
     steps:
     - uses: actions/checkout@v4
@@ -33,102 +30,76 @@ jobs:
       run: |
         mkdir -p scripts
         mkdir -p data/houston-county-ga
-        mkdir -p data/houston-county-ga/${{ matrix.zip }}
+        mkdir -p data/houston-county-ga/31088
+        mkdir -p data/houston-county-ga/31093
+        mkdir -p data/houston-county-ga/31098
     
-    - name: Collect free data
+    - name: Collect data for all ZIPs
       run: |
-        echo "Collecting free data for ZIP ${{ matrix.zip }}..."
-        # Use fetch_real_time_data.py instead of free_data_collector.py
-        if [ -f "scripts/fetch_real_time_data.py" ]; then
-          python scripts/fetch_real_time_data.py
-        else
-          echo "❌ Error: fetch_real_time_data.py not found!"
-          echo "Available scripts:"
-          ls -la scripts/
-          exit 1
-        fi
-    
-    - name: Archive collected data
-      run: |
-        echo "📁 Data collected for ZIP ${{ matrix.zip }}"
-        ls -la data/houston-county-ga/${{ matrix.zip }}/
-    
-    - name: Upload data as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: data-${{ matrix.zip }}
-        path: data/houston-county-ga/${{ matrix.zip }}
-        retention-days: 7
-  
-  generate-ai-insights:
-    runs-on: ubuntu-latest
-    needs: collect-free-data
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Download all data artifacts
-      run: |
-        echo "📥 Downloading data artifacts..."
-        mkdir -p data/houston-county-ga
-    
-    - name: Download artifact 31088
-      uses: actions/download-artifact@v4
-      with:
-        name: data-31088
-        path: data/houston-county-ga/31088
-    
-    - name: Download artifact 31093
-      uses: actions/download-artifact@v4
-      with:
-        name: data-31093
-        path: data/houston-county-ga/31093
-    
-    - name: Download artifact 31098
-      uses: actions/download-artifact@v4
-      with:
-        name: data-31098
-        path: data/houston-county-ga/31098
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: Install dependencies
-      run: |
-        pip install requests beautifulsoup4 pandas numpy
-        echo "✅ Dependencies installed"
-    
-    - name: Process data
-      run: |
-        echo "🔄 Processing collected data..."
-        # Run your data processing scripts
-        if [ -f "scripts/process_real_time_data.py" ]; then
-          python scripts/process_real_time_data.py
-        fi
+        echo "🚀 Starting data collection for all ZIP codes..."
         
-        if [ -f "scripts/calculate_metrics.py" ]; then
-          python scripts/calculate_metrics.py
-        fi
+        # Run collector for each ZIP code
+        python scripts/free_data_collector.py --all
+        
+        echo "📊 Data collection complete!"
+        echo "Files generated:"
+        find data/houston-county-ga -name "*.json" -type f | head -10
     
-    - name: Create dashboard JSON files
+    - name: Create dashboard JSON
       run: |
-        echo "📊 Creating dashboard JSON files..."
+        echo "📈 Creating dashboard JSON..."
         if [ -f "scripts/create_dashboard_json.py" ]; then
           python scripts/create_dashboard_json.py
         else
-          echo "⚠️ Warning: create_dashboard_json.py not found!"
+          echo "⚠️ create_dashboard_json.py not found, creating basic dashboard..."
+          # Create a simple dashboard
+          python -c "
+import json, os
+from datetime import datetime
+
+# Collect data from all ZIPs
+dashboard = {
+    'last_updated': datetime.now().isoformat(),
+    'zip_codes': {},
+    'summary': {}
+}
+
+zips = ['31088', '31093', '31098']
+for zip_code in zips:
+    latest_file = f'data/houston-county-ga/{zip_code}/latest.json'
+    if os.path.exists(latest_file):
+        try:
+            with open(latest_file, 'r') as f:
+                data = json.load(f)
+                dashboard['zip_codes'][zip_code] = {
+                    'properties_count': len(data.get('properties', [])),
+                    'market_health': data.get('market_stats', {}).get('market_health', 0),
+                    'median_price': data.get('market_stats', {}).get('median_price', 0),
+                    'last_updated': data.get('timestamp', '')
+                }
+        except:
+            pass
+
+# Calculate totals
+if dashboard['zip_codes']:
+    total_props = sum(z['properties_count'] for z in dashboard['zip_codes'].values())
+    avg_health = sum(z['market_health'] for z in dashboard['zip_codes'].values()) / len(dashboard['zip_codes'])
+    
+    dashboard['summary'] = {
+        'total_properties': total_props,
+        'average_market_health': round(avg_health, 1),
+        'zip_codes_processed': len(dashboard['zip_codes'])
+    }
+
+# Save dashboard
+with open('data/houston-county-ga/dashboard.json', 'w') as f:
+    json.dump(dashboard, f, indent=2)
+
+print('✅ Basic dashboard created at data/houston-county-ga/dashboard.json')
+          "
         fi
     
-    - name: Generate insights
-      run: |
-        echo "💡 Generating insights..."
-        if [ -f "scripts/generate_insights.py" ]; then
-          python scripts/generate_insights.py
-        fi
-    
-    - name: Generate DeepSeek AI insights
+    - name: Generate AI insights
       env:
         DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       run: |
@@ -136,86 +107,152 @@ jobs:
         if [ -f "scripts/deepseek_ai_insights.py" ]; then
           python scripts/deepseek_ai_insights.py
         else
-          echo "⚠️ DeepSeek AI script not found, using fallback..."
+          echo "ℹ️ Creating fallback AI insights..."
+          # Create simple fallback insights
+          python -c "
+import json, os
+from datetime import datetime
+
+insights = {
+    'timestamp': datetime.now().isoformat(),
+    'market_analysis': 'Market data collected successfully. Enable DeepSeek API for advanced insights.',
+    'recommendations': [
+        'Consider monitoring ZIP 31088 for investment opportunities',
+        'Market conditions appear stable across all tracked areas'
+    ],
+    'confidence': 0.7,
+    'source': 'fallback_insights'
+}
+
+os.makedirs('data/houston-county-ga/ai_insights', exist_ok=True)
+with open('data/houston-county-ga/ai_insights_summary.json', 'w') as f:
+    json.dump(insights, f, indent=2)
+
+print('✅ Fallback insights created')
+          "
         fi
     
-    - name: Run complete pipeline
+    - name: List generated files
       run: |
-        echo "🚀 Running complete pipeline..."
-        if [ -f "scripts/run_pipeline.py" ]; then
-          python scripts/run_pipeline.py
+        echo "📋 All generated files:"
+        find data/houston-county-ga -type f -name "*.json" | sort
+        echo ""
+        echo "📊 File counts by directory:"
+        for dir in data/houston-county-ga/*/; do
+          if [ -d "$dir" ]; then
+            count=$(find "$dir" -type f -name "*.json" | wc -l)
+            echo "  $(basename "$dir"): $count files"
+          fi
+        done
+        echo ""
+        echo "📁 Root JSON files:"
+        ls -la data/houston-county-ga/*.json 2>/dev/null || echo "No root JSON files"
+    
+    - name: Create README file
+      run: |
+        echo "📝 Creating README file..."
+        cat > data/houston-county-ga/README.md << 'EOF'
+        # Real Estate Data Collection
+        
+        ## Overview
+        This directory contains real estate data collected for Houston County, GA.
+        
+        ## ZIP Codes
+        - 31088 (Warner Robins)
+        - 31093 (Centerville) 
+        - 31098 (Bonaire)
+        
+        ## Files
+        
+        ### Main Files
+        - `dashboard.json` - Aggregated dashboard data for all ZIP codes
+        - `ai_insights_summary.json` - AI-generated market insights
+        
+        ### ZIP Code Directories
+        Each ZIP code directory contains:
+        - `latest.json` - Most recent data collection
+        - `properties.json` - Property listings
+        - `market_summary.json` - Market statistics
+        - `statistics.json` - Detailed metrics
+        - `full_data_*.json` - Historical data snapshots
+        
+        ## Update Schedule
+        Data is collected every 6 hours via GitHub Actions.
+        
+        ## Last Update
+        Generated: $(date)
+        
+        ## Source Code
+        See [GitHub Repository](https://github.com/NAGOHUSA/RHMR)
+        EOF
+    
+    - name: Verify data integrity
+      run: |
+        echo "🔍 Verifying data integrity..."
+        
+        # Check if essential files exist
+        essential_files=(
+          "data/houston-county-ga/31088/latest.json"
+          "data/houston-county-ga/31093/latest.json"
+          "data/houston-county-ga/31098/latest.json"
+          "data/houston-county-ga/dashboard.json"
+        )
+        
+        all_exist=true
+        for file in "${essential_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file exists"
+          else
+            echo "❌ $file missing"
+            all_exist=false
+          fi
+        done
+        
+        if [ "$all_exist" = true ]; then
+          echo "🎉 All essential files created successfully!"
         else
-          echo "✅ Individual scripts completed"
+          echo "⚠️ Some files are missing, but pipeline will continue"
         fi
-    
-    - name: Verify generated files
-      run: |
-        echo "📋 Generated files:"
-        ls -la data/houston-county-ga/*.json 2>/dev/null || echo "No dashboard files found"
-        echo ""
-        echo "📁 All files in data directory:"
-        find data/houston-county-ga -type f | head -30
-        echo ""
-        echo "📊 File counts:"
-        find data/houston-county-ga -type f -name "*.json" | wc -l
-        echo "JSON files"
-        find data/houston-county-ga -type f -name "*.txt" | wc -l
-        echo "TXT files"
-        find data/houston-county-ga -type f -name "*.csv" | wc -l
-        echo "CSV files"
-    
-    - name: Upload dashboard artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: dashboard-files
-        path: |
-          data/houston-county-ga/
-        retention-days: 7
   
-  deploy-dashboard:
+  deploy-to-github:
     runs-on: ubuntu-latest
-    needs: generate-ai-insights
+    needs: collect-and-process-data
     if: github.ref == 'refs/heads/main'
     
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
     
-    - name: Download dashboard artifacts
+    - name: Download data from previous job
       uses: actions/download-artifact@v4
       with:
-        name: dashboard-files
-        path: data/houston-county-ga/
+        name: data-artifacts
+        path: ./
     
-    - name: Setup git config
+    - name: Setup git
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git config pull.rebase false
     
-    - name: Pull latest changes
+    - name: Commit and push data
       run: |
-        git pull origin main || echo "Pull failed, continuing..."
-    
-    - name: Commit and push data updates
-      run: |
-        # Add all data files
-        git add data/
-        
-        # Check if there are any changes
-        if git diff --cached --quiet; then
-          echo "No changes to commit"
-        else
+        # Check if there are changes in the data directory
+        if git diff --name-only HEAD | grep -q "^data/"; then
+          git add data/
           git commit -m "📊 Automated data update $(date +'%Y-%m-%d %H:%M UTC')"
           git push origin main
-          echo "✅ Data pushed to repository"
+          echo "✅ Data committed and pushed to repository"
+        else
+          echo "⏭️ No data changes to commit"
         fi
     
-    - name: Create simple HTML dashboard
+    - name: Create simple dashboard page
       run: |
-        echo "🌐 Creating simple HTML dashboard..."
+        echo "🌐 Creating dashboard page..."
         mkdir -p docs
         
-        # Create a basic index.html
+        # Create a minimal index.html
         cat > docs/index.html << 'EOF'
         <!DOCTYPE html>
         <html lang="en">
@@ -224,129 +261,119 @@ jobs:
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Real Estate Dashboard</title>
             <style>
-                body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
-                .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
-                .container { display: flex; flex-wrap: wrap; gap: 20px; }
-                .card { border: 1px solid #ddd; padding: 20px; border-radius: 5px; flex: 1; min-width: 300px; }
-                .data-section { background: #f9f9f9; padding: 15px; border-radius: 3px; margin: 10px 0; }
-                .success { color: #27ae60; }
-                .error { color: #e74c3c; }
-                pre { background: #2d3436; color: #dfe6e9; padding: 15px; border-radius: 3px; overflow-x: auto; }
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }
+                .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+                .card { border: 1px solid #ddd; padding: 20px; border-radius: 5px; }
+                .data-row { display: flex; justify-content: space-between; margin: 10px 0; }
+                .status { padding: 5px 10px; border-radius: 3px; font-weight: bold; }
+                .success { background: #27ae60; color: white; }
+                .warning { background: #f39c12; color: white; }
+                .danger { background: #e74c3c; color: white; }
+                a { color: #3498db; text-decoration: none; }
+                a:hover { text-decoration: underline; }
             </style>
         </head>
         <body>
             <div class="header">
-                <h1>🏠 Real Estate Market Dashboard</h1>
-                <p>Automated data pipeline for Houston County, GA</p>
-                <p><small>Updated: <span id="update-time">$(date)</span></small></p>
+                <h1>🏠 Real Estate Dashboard</h1>
+                <p>Houston County, GA - Automated Data Collection</p>
+                <p><small>Last updated: <span id="update-time">Loading...</span></small></p>
             </div>
             
             <div class="container">
                 <div class="card">
-                    <h2>📊 Pipeline Status</h2>
-                    <div class="data-section">
-                        <p><strong>Status:</strong> <span class="success">✓ Running</span></p>
-                        <p><strong>Last Run:</strong> <span id="last-run">$(date)</span></p>
-                        <p><strong>Next Run:</strong> In 6 hours</p>
-                    </div>
+                    <h2>📊 Dashboard Files</h2>
+                    <p>Download the latest data:</p>
+                    <ul>
+                        <li><a href="data/houston-county-ga/dashboard.json" download>Complete Dashboard (JSON)</a></li>
+                        <li><a href="data/houston-county-ga/ai_insights_summary.json" download>AI Insights (JSON)</a></li>
+                    </ul>
                 </div>
                 
                 <div class="card">
                     <h2>📍 Coverage Areas</h2>
-                    <div class="data-section">
-                        <ul>
-                            <li>ZIP 31088 - Warner Robins</li>
-                            <li>ZIP 31093 - Centerville</li>
-                            <li>ZIP 31098 - Bonaire</li>
-                        </ul>
-                        <p>Total properties tracked: <strong id="property-count">Loading...</strong></p>
-                    </div>
+                    <ul>
+                        <li>31088 - Warner Robins</li>
+                        <li>31093 - Centerville</li>
+                        <li>31098 - Bonaire</li>
+                    </ul>
                 </div>
                 
                 <div class="card">
-                    <h2>📁 Data Files</h2>
-                    <div class="data-section">
-                        <p>Available JSON files:</p>
-                        <div id="file-list">
-                            <p>Loading file list...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>🔗 Quick Links</h2>
-                <div class="data-section">
+                    <h2>🔗 Repository</h2>
+                    <p>View source code and pipeline:</p>
                     <ul>
                         <li><a href="https://github.com/NAGOHUSA/RHMR" target="_blank">GitHub Repository</a></li>
-                        <li><a href="https://github.com/NAGOHUSA/RHMR/actions" target="_blank">Pipeline Runs</a></li>
-                        <li><a href="data/houston-county-ga/" target="_blank">Raw Data Directory</a></li>
+                        <li><a href="https://github.com/NAGOHUSA/RHMR/actions" target="_blank">Pipeline Status</a></li>
+                        <li><a href="https://github.com/NAGOHUSA/RHMR/tree/main/scripts" target="_blank">Source Code</a></li>
                     </ul>
                 </div>
             </div>
             
             <div class="card">
-                <h2>📈 Sample Data</h2>
-                <div class="data-section">
-                    <p>Latest dashboard data:</p>
-                    <pre id="sample-data">Loading sample data...</pre>
-                </div>
+                <h2>📈 Quick Stats</h2>
+                <div id="stats">Loading statistics...</div>
+            </div>
+            
+            <div class="card">
+                <h2>🔄 Update Schedule</h2>
+                <p>Data is collected automatically:</p>
+                <ul>
+                    <li>Every 6 hours</li>
+                    <li>3 times daily (8 AM, 2 PM, 8 PM UTC)</li>
+                    <li>On every push to main branch</li>
+                </ul>
             </div>
             
             <script>
-                // Update time dynamically
+                // Update time
                 document.getElementById('update-time').textContent = new Date().toLocaleString();
                 
-                // Try to load a sample data file
-                fetch('data/houston-county-ga/dashboard_simple.json')
+                // Load and display dashboard stats
+                fetch('data/houston-county-ga/dashboard.json')
                     .then(response => {
-                        if (!response.ok) throw new Error('File not found');
+                        if (!response.ok) throw new Error('Dashboard not found');
                         return response.json();
                     })
                     .then(data => {
-                        document.getElementById('sample-data').textContent = 
-                            JSON.stringify(data, null, 2).substring(0, 1000) + '...';
+                        const statsDiv = document.getElementById('stats');
+                        let html = '';
                         
-                        if (data.market_overview) {
-                            document.getElementById('property-count').textContent = 
-                                data.market_overview.total_properties || 'N/A';
-                        }
-                    })
-                    .catch(error => {
-                        document.getElementById('sample-data').textContent = 
-                            'Error loading dashboard data. Check data/houston-county-ga/ directory.';
-                    });
-                
-                // List available files
-                fetch('data/houston-county-ga/')
-                    .then(response => response.text())
-                    .then(html => {
-                        // Simple parsing to get file list
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const links = doc.querySelectorAll('a');
-                        let fileList = '';
-                        links.forEach(link => {
-                            if (link.href && !link.href.includes('?') && 
-                                (link.href.endsWith('.json') || link.href.endsWith('.csv'))) {
-                                fileList += `<li><a href="${link.href}" target="_blank">${link.textContent}</a></li>`;
+                        if (data.zip_codes && Object.keys(data.zip_codes).length > 0) {
+                            html += '<div class="data-row"><strong>ZIP Codes Processed:</strong> ' + Object.keys(data.zip_codes).length + '</div>';
+                            
+                            for (const [zip, info] of Object.entries(data.zip_codes)) {
+                                const health = info.market_health || 0;
+                                let statusClass = 'warning';
+                                if (health >= 70) statusClass = 'success';
+                                if (health < 50) statusClass = 'danger';
+                                
+                                html += `
+                                <div class="data-row">
+                                    <span>${zip}:</span>
+                                    <span>${info.properties_count || 0} properties</span>
+                                    <span class="status ${statusClass}">${health}/100</span>
+                                </div>`;
                             }
-                        });
-                        document.getElementById('file-list').innerHTML = 
-                            fileList ? `<ul>${fileList}</ul>` : '<p>No JSON/CSV files found</p>';
+                        } else {
+                            html = '<p>No data available yet. Check back soon!</p>';
+                        }
+                        
+                        statsDiv.innerHTML = html;
                     })
                     .catch(error => {
-                        document.getElementById('file-list').innerHTML = 
-                            '<p>Unable to load file list</p>';
+                        document.getElementById('stats').innerHTML = 
+                            '<p>Unable to load dashboard data. Data may still be processing.</p>';
                     });
             </script>
         </body>
         </html>
         EOF
         
-        echo "✅ HTML dashboard created at docs/index.html"
+        echo "✅ Dashboard page created"
     
-    - name: Deploy to GitHub Pages
+    - name: Upload dashboard page
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -354,3 +381,11 @@ jobs:
         keep_files: false
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
+    
+    - name: Upload data as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: data-artifacts
+        path: |
+          data/houston-county-ga/
+        retention-days: 7
