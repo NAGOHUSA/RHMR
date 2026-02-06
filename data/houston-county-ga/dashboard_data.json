@@ -12,38 +12,14 @@
         "buyer_seller_index": 65,
         "opportunity_score": 78
       }
-    },
-    {
-      "zip": "31093",
-      "city": "Centerville",
-      "metrics": {
-        "composite_price": 275000,
-        "composite_inventory": 92,
-        "market_velocity": 72,
-        "price_momentum": 0.1,
-        "buyer_seller_index": 58,
-        "opportunity_score": 65
-      }
-    },
-    {
-      "zip": "31098",
-      "city": "Bonaire",
-      "metrics": {
-        "composite_price": 295000,
-        "composite_inventory": 78,
-        "market_velocity": 88,
-        "price_momentum": 0.5,
-        "buyer_seller_index": 72,
-        "opportunity_score": 82
-      }
     }
   ],
   "market_summary": {
-    "avg_price": 286500,
-    "total_inventory": 275,
-    "avg_opportunity_score": 75,
+    "avg_price": 289500,
+    "total_inventory": 105,
+    "avg_opportunity_score": 78,
     "market_trend": "heating",
-    "best_opportunity_zip": "31098"
+    "best_opportunity_zip": "31088"
   },
   "trends_24h": {
     "price_movement": "+0.3%",
