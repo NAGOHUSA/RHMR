@@ -5,12 +5,12 @@
   "updated": "2026-06-16",
   "period": "monthly",
   "inventory": {
-    "active": 500,
-    "change_pct": -0.2
+    "active": 1000,
+    "change_pct": -0.1
   },
   "pricing": {
-    "median_list": 236887,
-    "median_sale": 229781,
+    "median_list": 238061,
+    "median_sale": 230919,
     "spread_pct": -3.0,
     "trend": "heating"
   },
@@ -27,10 +27,10 @@
   },
   "history": {
     "median_list": [
-      235354.616482429,
-      235974.3628035708,
-      236414.48353868234,
-      236887.64119561843
+      236937.08642865662,
+      237379.00275980044,
+      237854.0907961613,
+      238061.64399638152
     ]
   },
   "weekly_insights": [
