@@ -2,15 +2,15 @@
   "market": "Houston County, GA",
   "zip": "31088",
   "city": "Warner Robins",
-  "updated": "2026-08-16",
+  "updated": "2026-08-17",
   "period": "monthly",
   "inventory": {
-    "active": 833,
-    "change_pct": -0.1
+    "active": 476,
+    "change_pct": -0.2
   },
   "pricing": {
-    "median_list": 240290,
-    "median_sale": 233081,
+    "median_list": 240002,
+    "median_sale": 232802,
     "spread_pct": -3.0,
     "trend": "heating"
   },
@@ -27,10 +27,10 @@
   },
   "history": {
     "median_list": [
-      239302.89650393778,
-      239781.8350025992,
-      239991.07036635894,
-      240290.19402940656
+      238996.86028613246,
+      239205.41067527627,
+      239503.5550960365,
+      240002.9298024051
     ]
   },
   "weekly_insights": [
